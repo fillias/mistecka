@@ -22,3 +22,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true });
 }
 */
+
+/* 
+export {}; 
+tohle je tu kvuli tomu 
+aby prosel build v netlify kdyz je vse zacommentovane
+*/
+
+export {};
