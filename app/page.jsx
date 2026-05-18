@@ -6,12 +6,8 @@ export default function Page() {
             <section>
                 <h1 className="mb-4">Netlify Platform Starter – Next.js</h1>
                 <p className="mb-6 text-lg">Deploy the latest version of Next.js —</p>
-                <Link href="/login" className="btn btn-lg sm:min-w-64">
+                <Link href="/login" className="btn btn-lg sm:min-w-32">
                     Login
-                </Link>
-
-                <Link href="/signup" className="btn btn-lg sm:min-w-64">
-                    Signup
                 </Link>
             </section>
 

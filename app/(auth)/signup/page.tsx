@@ -1,3 +1,18 @@
+import Link from 'next/link';
+
+export default function page() {
+    return (
+        <>
+            <h1>Registrace jen na pozvání</h1>
+            <Link href="/" className="btn mt-5 btn-lg sm:min-w-32">
+                Home
+            </Link>
+        </>
+    );
+}
+
+/*
+
 'use client';
 
 import { useState } from 'react';
@@ -70,3 +85,5 @@ export default function SignupPage() {
     </form>
   );
 }
+
+*/
