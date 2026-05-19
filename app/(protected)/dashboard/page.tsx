@@ -8,7 +8,7 @@ export default async function page({}: pageProps) {
     const { email } = await userInfo();
     return (
         <>
-            <section className="relative flex min-h-[65vh] items-center justify-center overflow-hidden py-10 sm:min-h-[65vh] sm:py-16">
+            <section className="relative flex min-h-[70vh] items-center justify-center overflow-hidden py-10 sm:min-h-[70vh] sm:py-16">
                 <Image
                     src="/images/les.jpg"
                     alt=""
