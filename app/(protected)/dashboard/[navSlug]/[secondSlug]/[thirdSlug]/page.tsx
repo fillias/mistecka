@@ -1,7 +1,6 @@
-// app/(protected)/dashboard/[navSlug]/[secondSlug]/[thirdSlug]/page.tsx
 import { notFound } from 'next/navigation';
-import Link from 'next/link';
 import Breadcrumb from '@/components/Breadcrumb';
+import PlaceCard from '@/components/PlaceCard';
 import { getNavBySlug, getCountryBySlug, getAreaBySlug, getPlacesByAreaId } from '@/lib/db/nav';
 
 type Props = {
@@ -14,7 +13,6 @@ export default async function ThirdLevelPage({ params }: Props) {
 
     if (!nav) notFound();
 
-    // Jen parkovani má třetí úroveň přes country → area → places
     const country = await getCountryBySlug(secondSlug);
     if (!country) notFound();
 
@@ -24,7 +22,7 @@ export default async function ThirdLevelPage({ params }: Props) {
     const places = await getPlacesByAreaId(area.id);
 
     return (
-        <div>
+        <div className="page-stack">
             <Breadcrumb
                 items={[
                     { label: nav.name, href: `/dashboard/${navSlug}` },
@@ -32,27 +30,31 @@ export default async function ThirdLevelPage({ params }: Props) {
                     { label: area.name }
                 ]}
             />
-            <h1>{area.name}</h1>
-            <ul>
-                {places.map((place) => (
-                    <li key={place.id}>
-                        <div>
-                            <strong>{place.place_name}</strong>
-                            {place.place_type && <span> · {place.place_type}</span>}
-                            {place.place_description && <p>{place.place_description}</p>}
-                            {place.place_gps_coords && (
-                                <a
-                                    href={`https://maps.google.com/?q=${place.place_gps_coords}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
-                                    Zobrazit na mapě
-                                </a>
-                            )}
-                        </div>
-                    </li>
-                ))}
-            </ul>
+
+            <div className="card">
+                <span className="eyebrow mb-3">{country.name}</span>
+                <h1 className="mb-1">{area.name}</h1>
+                <p>
+                    {places.length} {places.length === 1 ? 'místo' : 'míst'} v této oblasti
+                </p>
+            </div>
+
+            {places.length === 0 ? (
+                <div className="card flex flex-col items-center py-12 text-center">
+                    <p className="mb-1 text-base font-medium" style={{ color: 'rgb(var(--text))' }}>
+                        Zatím žádná místa
+                    </p>
+                    <p>V této oblasti ještě nejsou přidána žádná místa.</p>
+                </div>
+            ) : (
+                <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    {places.map((place) => (
+                        <li key={place.id}>
+                            <PlaceCard place={place} />
+                        </li>
+                    ))}
+                </ul>
+            )}
         </div>
     );
 }

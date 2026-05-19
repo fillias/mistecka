@@ -1,4 +1,3 @@
-// app/(protected)/dashboard/[navSlug]/page.tsx
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { getNavBySlug, getCountriesByNavId, getAreasByNavId } from '@/lib/db/nav';
@@ -13,19 +12,29 @@ export default async function NavPage({ params }: Props) {
 
     if (!nav) notFound();
 
-    // Parkovani má strukturu přes country
     const hasCountries = nav.slug === 'parkovani';
 
     if (hasCountries) {
         const countries = await getCountriesByNavId(nav.id);
 
         return (
-            <div>
-                <h1>{nav.name}</h1>
-                <ul>
+            <div className="page-stack">
+                <div className="card">
+                    <span className="eyebrow mb-3">{nav.name}</span>
+                    <h2 className="mb-1">Vyber zemi</h2>
+                </div>
+
+                <ul className="list-links">
                     {countries.map((country) => (
                         <li key={country.id}>
-                            <Link href={`/dashboard/${navSlug}/${country.slug}`}>{country.name}</Link>
+                            <Link href={`/dashboard/${navSlug}/${country.slug}`} className="list-link">
+                                <div className="flex items-center justify-between gap-3">
+                                    <h2 className="text-base font-semibold" style={{ color: 'rgb(var(--text))' }}>
+                                        {country.name}
+                                    </h2>
+                                    <span className="meta-text shrink-0">→</span>
+                                </div>
+                            </Link>
                         </li>
                     ))}
                 </ul>
@@ -37,12 +46,23 @@ export default async function NavPage({ params }: Props) {
     const areas = await getAreasByNavId(nav.id);
 
     return (
-        <div>
-            <h1>{nav.name}</h1>
-            <ul>
+        <div className="page-stack">
+            <div className="card">
+                <span className="eyebrow mb-3">{nav.name}</span>
+                <h2 className="mb-1">Vyber oblast</h2>
+            </div>
+
+            <ul className="list-links">
                 {areas.map((area) => (
                     <li key={area.id}>
-                        <Link href={`/dashboard/${navSlug}/${area.slug}`}>{area.name}</Link>
+                        <Link href={`/dashboard/${navSlug}/${area.slug}`} className="list-link">
+                            <div className="flex items-center justify-between gap-3">
+                                <h2 className="text-base font-semibold" style={{ color: 'rgb(var(--text))' }}>
+                                    {area.name}
+                                </h2>
+                                <span className="meta-text shrink-0">→</span>
+                            </div>
+                        </Link>
                     </li>
                 ))}
             </ul>

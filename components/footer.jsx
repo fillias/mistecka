@@ -1,16 +1,18 @@
 import Link from 'next/link';
+import ThemeToggle from './ThemeToggle';
 
 export function Footer() {
     return (
-        <footer className="pt-16 pb-12 sm:pt-24 sm:pb-16">
-            <p className="text-sm">
-                <Link
-                    href="https://docs.netlify.com/frameworks/next-js/overview/"
-                    className="decoration-dashed text-primary underline-offset-8"
-                >
-                    Mistecka
+        <footer className="mt-auto border-t py-2 sm:py-2" style={{ borderColor: 'rgb(var(--border))' }}>
+            <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center justify-start">
+                    <ThemeToggle />
+                </div>
+
+                <Link href="/logout" className="btn btn-ghost text-sm" style={{ color: 'rgb(var(--text-soft))' }}>
+                    Odhlásit →
                 </Link>
-            </p>
+            </div>
         </footer>
     );
 }

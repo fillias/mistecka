@@ -8,8 +8,6 @@ export default async function page({}: pageProps) {
 
     return (
         <>
-            <h1>dashboard {isAdmin ? 'admin' : 'uzivatel'}</h1>
-            <p>Ahoj {email}</p>
             <Link href="/logout" className="btn btn-lg sm:min-w-64">
                 logout
             </Link>

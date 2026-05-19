@@ -1,6 +1,5 @@
 import '../styles/globals.css';
 import { Footer } from '../components/footer';
-// import { Header } from '../components/header';
 
 export const metadata = {
     title: {
@@ -9,16 +8,29 @@ export const metadata = {
     }
 };
 
+const themeScript = `
+(function () {
+  try {
+    var storedTheme = localStorage.getItem('theme');
+    var theme = storedTheme === 'light' || storedTheme === 'dark' ? storedTheme : 'dark';
+    document.documentElement.setAttribute('data-theme', theme);
+  } catch (e) {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }
+})();
+`;
+
 export default function RootLayout({ children }) {
     return (
-        <html lang="en">
+        <html lang="cs" suppressHydrationWarning>
             <head>
                 <link rel="icon" href="/favicon.png" sizes="any" />
+                <script dangerouslySetInnerHTML={{ __html: themeScript }} />
             </head>
-            <body className="antialiased text-white bg-blue-900">
-                <div className="flex flex-col min-h-screen px-6 bg-noise sm:px-12">
-                    <div className="flex flex-col w-full max-w-5xl mx-auto grow">
-                        <main className="grow">{children}</main>
+            <body>
+                <div className="app-shell">
+                    <div className="app-container flex min-h-screen flex-col">
+                        <main className="flex-1 ">{children}</main>
                         <Footer />
                     </div>
                 </div>

@@ -1,4 +1,3 @@
-// src/components/DashboardNav.tsx
 'use client';
 
 import Link from 'next/link';
@@ -14,28 +13,37 @@ export default function DashboardNav({ items }: DashboardNavProps) {
     const pathname = usePathname();
 
     return (
-        <nav className="flex flex-wrap items-center gap-4 pt-6 pb-12 sm:pt-12 md:pb-24" aria-label="Hlavní navigace">
-            <Link href="/dashboard">
-                <Image src="/surfer-van.svg" height={60} width={60} priority alt="Netlify logo" />
+        <nav aria-label="Hlavní navigace" className="nav-scroll items-center">
+            <Link
+                href="/dashboard"
+                className="mr-3 flex h-14 w-14 shrink-0 items-center justify-center sm:mr-4 sm:h-16 sm:w-16"
+                aria-label="Přejít na dashboard"
+            >
+                <Image
+                    src="/surfer-van.svg"
+                    width={48}
+                    height={48}
+                    priority
+                    alt="Místečka logo"
+                    className="logo-img h-10 w-10 sm:h-12 sm:w-12"
+                />
             </Link>
-            <ul className="flex flex-wrap gap-x-4 gap-y-1">
-                {items.map((item) => {
-                    const href = `/dashboard/${item.slug}`;
-                    const isActive = pathname.startsWith(href);
 
-                    return (
-                        <li key={item.id}>
-                            <Link
-                                href={href}
-                                aria-current={isActive ? 'page' : undefined}
-                                className="inline-flex px-1.5 py-1 sm:px-3 sm:py-2"
-                            >
-                                {item.name}
-                            </Link>
-                        </li>
-                    );
-                })}
-            </ul>
+            {items.map((item) => {
+                const href = `/dashboard/${item.slug}`;
+                const isActive = pathname.startsWith(href);
+
+                return (
+                    <Link
+                        key={item.id}
+                        href={href}
+                        aria-current={isActive ? 'page' : undefined}
+                        className={`nav-pill ${isActive ? 'nav-pill-active' : ''}`}
+                    >
+                        {item.name}
+                    </Link>
+                );
+            })}
         </nav>
     );
 }
