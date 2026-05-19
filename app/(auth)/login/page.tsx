@@ -8,8 +8,14 @@ Netlify pak dostane jen prázdný shell, a formulář se doplní na klientu. Pro
 */
 export default function LoginPage() {
     return (
-        <Suspense fallback={null}>
-            <LoginForm />
-        </Suspense>
+        <>
+            <section className="flex min-h-[70vh] items-center justify-center py-10 sm:min-h-[80vh] sm:py-16">
+                <div className="w-full max-w-md">
+                    <Suspense fallback={null}>
+                        <LoginForm />
+                    </Suspense>
+                </div>
+            </section>
+        </>
     );
 }
