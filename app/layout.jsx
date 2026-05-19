@@ -25,7 +25,7 @@ export default function RootLayout({ children }) {
         <html lang="cs" suppressHydrationWarning>
             <head>
                 <link rel="icon" href="/favicon.png" sizes="any" />
-                <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+                {/* <script dangerouslySetInnerHTML={{ __html: themeScript }} /> */}
             </head>
             <body>
                 <div className="app-shell">
