@@ -30,7 +30,7 @@ export default function DashboardNav({ items }: DashboardNavProps) {
             </Link>
 
             {items.map((item) => {
-                const href = `/dashboard/${item.slug}`;
+                const href = `/dashboard/${item.id}-${item.slug}`;
                 const isActive = pathname.startsWith(href);
 
                 return (

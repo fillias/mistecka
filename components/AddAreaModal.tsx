@@ -12,8 +12,6 @@ type Props = {
 };
 
 export default function AddAreaModal({ navId, countryId, navSlug, countrySlug }: Props) {
-    console.log(navId, countryId, navSlug, countrySlug);
-
     const router = useRouter();
     const [open, setOpen] = useState(false);
     const [name, setName] = useState('');

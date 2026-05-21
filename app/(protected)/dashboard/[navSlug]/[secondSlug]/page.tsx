@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Breadcrumb from '@/components/Breadcrumb';
 import PlaceCard from '@/components/PlaceCard';
-import { getNavBySlug, getCountryBySlug, getAreaBySlug, getAreasByCountryId, getPlacesByAreaId } from '@/lib/db/nav';
+import { getNavBySlug, getCountryBySlug, getAreaBySlug, getPlacesByAreaId, getAreasById } from '@/lib/db/nav';
 import AddAreaModal from '@/components/AddAreaModal';
 import userInfo from '@/lib/userInfo';
 
@@ -15,6 +15,7 @@ export default async function SecondLevelPage({ params }: Props) {
 
     const { navSlug, secondSlug } = await params;
     const nav = await getNavBySlug(navSlug);
+    // console.log('nav: ', nav);
 
     if (!nav) notFound();
 
@@ -24,7 +25,7 @@ export default async function SecondLevelPage({ params }: Props) {
         const country = await getCountryBySlug(secondSlug);
         if (!country) notFound();
 
-        const areas = await getAreasByCountryId(country.id);
+        const areas = await getAreasById(nav.id, country.id);
 
         return (
             <div className="page-stack">
@@ -51,7 +52,10 @@ export default async function SecondLevelPage({ params }: Props) {
                 <ul className="list-links">
                     {areas.map((area) => (
                         <li key={area.id}>
-                            <Link href={`/dashboard/${navSlug}/${secondSlug}/${area.slug}`} className="list-link">
+                            <Link
+                                href={`/dashboard/${navSlug}/${secondSlug}/${area.id}-${area.slug}`}
+                                className="list-link"
+                            >
                                 <div className="flex items-center justify-between gap-3">
                                     <h2 className="text-base font-semibold" style={{ color: 'rgb(var(--text))' }}>
                                         {area.name}

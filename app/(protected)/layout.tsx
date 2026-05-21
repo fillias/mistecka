@@ -4,6 +4,7 @@ import { getNavigationData } from '@/lib/db/nav';
 
 export default async function ProtectedLayout({ children }: { children: React.ReactNode }) {
     const { mainNav } = await getNavigationData();
+    console.log('mainNav: ', mainNav);
 
     return (
         <>

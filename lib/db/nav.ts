@@ -45,19 +45,28 @@ export async function getAreas() {
     return data.areas;
 }
 
+export async function getAreasById(navId: string, countryId: string | null) {
+    const data = await getNavigationData();
+    if (countryId) {
+        return data.areas.filter((item) => item.nav_id === navId && item.country_id === countryId);
+    } else {
+        return data.areas.filter((item) => item.nav_id === navId);
+    }
+}
+
 export async function getNavBySlug(slug: string) {
     const data = await getNavigationData();
-    return data.mainNav.find((item) => item.slug === slug) ?? null;
+    return data.mainNav.find((item) => item.id === getLeadingNumber(slug)) ?? null;
 }
 
 export async function getCountryBySlug(slug: string) {
     const data = await getNavigationData();
-    return data.countries.find((item) => item.slug === slug) ?? null;
+    return data.countries.find((item) => item.id === getLeadingNumber(slug)) ?? null;
 }
 
 export async function getAreaBySlug(slug: string) {
     const data = await getNavigationData();
-    return data.areas.find((item) => item.slug === slug) ?? null;
+    return data.areas.find((item) => item.id === getLeadingNumber(slug)) ?? null;
 }
 
 export async function getCountriesByNavId(navId: string) {
@@ -81,4 +90,9 @@ export async function getPlacesByAreaId(areaId: number) {
 
     if (error) throw error;
     return data ?? [];
+}
+
+function getLeadingNumber(str) {
+    const match = str.match(/^(\d+)-/);
+    return match ? parseInt(match[1], 10) : null;
 }

@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import Breadcrumb from '@/components/Breadcrumb';
 import PlaceCard from '@/components/PlaceCard';
-import { getNavBySlug, getCountryBySlug, getAreaBySlug, getPlacesByAreaId } from '@/lib/db/nav';
+import { getNavBySlug, getCountryBySlug, getPlacesByAreaId, getAreaBySlug } from '@/lib/db/nav';
 
 type Props = {
     params: Promise<{ navSlug: string; secondSlug: string; thirdSlug: string }>;
@@ -10,6 +10,7 @@ type Props = {
 export default async function ThirdLevelPage({ params }: Props) {
     const { navSlug, secondSlug, thirdSlug } = await params;
     const nav = await getNavBySlug(navSlug);
+    console.log('nav: ', nav);
 
     if (!nav) notFound();
 
@@ -17,6 +18,7 @@ export default async function ThirdLevelPage({ params }: Props) {
     if (!country) notFound();
 
     const area = await getAreaBySlug(thirdSlug);
+
     if (!area) notFound();
 
     const places = await getPlacesByAreaId(area.id);
