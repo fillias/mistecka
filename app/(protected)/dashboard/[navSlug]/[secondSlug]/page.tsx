@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Breadcrumb from '@/components/Breadcrumb';
 import PlaceCard from '@/components/PlaceCard';
-import { getNavBySlug, getCountryBySlug, getAreaBySlug, getPlacesByAreaId, getAreasById } from '@/lib/db/nav';
+import { getNavBySlug, getCountryBySlug, getAreaBySlug, getPlacesById, getAreasById } from '@/lib/db/nav';
 import AddAreaModal from '@/components/AddAreaModal';
 import userInfo from '@/lib/userInfo';
 
@@ -74,7 +74,7 @@ export default async function SecondLevelPage({ params }: Props) {
     const area = await getAreaBySlug(secondSlug);
     if (!area) notFound();
 
-    const places = await getPlacesByAreaId(area.id);
+    const places = await getPlacesById(nav.id, null, area.id);
 
     return (
         <div className="page-stack">

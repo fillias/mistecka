@@ -30,20 +30,6 @@ export const getNavigationData = unstable_cache(fetchNavigationData, ['navigatio
 });
 
 // Volitelné helpery nad jedním společným zdrojem
-export async function getMainNav() {
-    const data = await getNavigationData();
-    return data.mainNav;
-}
-
-export async function getCountries() {
-    const data = await getNavigationData();
-    return data.countries;
-}
-
-export async function getAreas() {
-    const data = await getNavigationData();
-    return data.areas;
-}
 
 export async function getAreasById(navId: string, countryId: string | null) {
     const data = await getNavigationData();
@@ -74,19 +60,14 @@ export async function getCountriesByNavId(navId: string) {
     return data.countries.filter((item) => item.nav_id === navId);
 }
 
-export async function getAreasByNavId(navId: string) {
-    const data = await getNavigationData();
-    return data.areas.filter((item) => item.nav_id === navId);
-}
-
-export async function getAreasByCountryId(countryId: string) {
-    const data = await getNavigationData();
-    return data.areas.filter((item) => item.country_id === countryId);
-}
-
-export async function getPlacesByAreaId(areaId: number) {
+export async function getPlacesById(navId: number, countryId: number | null, areaId: number) {
     const supabase = await createAdminClient();
-    const { data, error } = await supabase.from('place').select('*').eq('area_id', areaId).order('place_name');
+
+    let query = supabase.from('place').select('*').eq('nav_id', navId).eq('area_id', areaId);
+
+    query = countryId === null ? query.is('country_id', null) : query.eq('country_id', countryId);
+
+    const { data, error } = await query.order('place_name');
 
     if (error) throw error;
     return data ?? [];
