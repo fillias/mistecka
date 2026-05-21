@@ -3,7 +3,7 @@ import { revalidatePath } from 'next/cache';
 import userInfo from '@/lib/userInfo';
 import { createAdminClient } from '@/lib/supabase/admin';
 
-import { slugify } from '@/utils';
+import { slugify } from '@/lib/utils';
 
 export async function POST(req: NextRequest) {
     try {

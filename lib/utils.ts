@@ -1,18 +1,22 @@
-import { uniqueNamesGenerator, adjectives, animals, NumberDictionary } from 'unique-names-generator';
+import { uniqueNamesGenerator, adjectives, animals } from 'unique-names-generator';
 
 /*
 Get the actual size of a resource downloaded by the browser (e.g. an image) in bytes.
 This is supported in recent versions of all major browsers, with some caveats.
 See https://developer.mozilla.org/en-US/docs/Web/API/PerformanceResourceTiming/encodedBodySize
 */
-export function getResourceSize(url) {
-    const entry = window?.performance?.getEntriesByName(url)?.[0];
-    if (entry) {
-        const size = entry?.encodedBodySize;
-        return size || undefined;
-    } else {
+export function getResourceSize(url: string): number | undefined {
+    if (typeof window === 'undefined' || !window.performance) {
         return undefined;
     }
+
+    const entry = window.performance.getEntriesByName(url)[0];
+
+    if (entry instanceof PerformanceResourceTiming) {
+        return entry.encodedBodySize || undefined;
+    }
+
+    return undefined;
 }
 
 // Note: this only works on the server side
@@ -20,7 +24,7 @@ export function getNetlifyContext() {
     return process.env.CONTEXT;
 }
 
-export function randomInt(min, max) {
+export function randomInt(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
