@@ -3,14 +3,7 @@ import { revalidatePath } from 'next/cache';
 import userInfo from '@/lib/userInfo';
 import { createAdminClient } from '@/lib/supabase/admin';
 
-function slugify(value: string) {
-    return value
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/(^-|-$)+/g, '');
-}
+import { slugify } from '@/utils';
 
 export async function POST(req: NextRequest) {
     try {
@@ -21,7 +14,6 @@ export async function POST(req: NextRequest) {
         }
 
         const body = await req.json();
-        console.log('body: ', body);
         const navSlug = String(body.navSlug);
         const name = String(body.name ?? '').trim();
         const code = String(body.code ?? '')

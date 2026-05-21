@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { getNavBySlug, getCountriesByNavId, getAreasByNavId } from '@/lib/db/nav';
 import userInfo from '@/lib/userInfo';
 import AddCountryModal from '@/components/AddCountryModal';
+import AddAreaModal from '@/components/AddAreaModal';
 
 type Props = {
     params: Promise<{ navSlug: string }>;
@@ -57,8 +58,14 @@ export default async function NavPage({ params }: Props) {
     return (
         <div className="page-stack">
             <div className="card">
-                <span className="eyebrow mb-3">{nav.name}</span>
-                <h2 className="mb-1">Vyber oblast</h2>
+                <div className="flex items-start justify-between gap-4">
+                    <div>
+                        <span className="eyebrow mb-3 block">{nav.name}</span>
+                        <h2 className="mb-1">Vyber oblast</h2>
+                    </div>
+
+                    {(isAdmin || isEditor) && <AddAreaModal navId={nav.id} navSlug={navSlug} />}
+                </div>
             </div>
 
             <ul className="list-links">

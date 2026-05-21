@@ -3,12 +3,16 @@ import Link from 'next/link';
 import Breadcrumb from '@/components/Breadcrumb';
 import PlaceCard from '@/components/PlaceCard';
 import { getNavBySlug, getCountryBySlug, getAreaBySlug, getAreasByCountryId, getPlacesByAreaId } from '@/lib/db/nav';
+import AddAreaModal from '@/components/AddAreaModal';
+import userInfo from '@/lib/userInfo';
 
 type Props = {
     params: Promise<{ navSlug: string; secondSlug: string }>;
 };
 
 export default async function SecondLevelPage({ params }: Props) {
+    const { isAdmin, isEditor } = await userInfo();
+
     const { navSlug, secondSlug } = await params;
     const nav = await getNavBySlug(navSlug);
 
@@ -27,8 +31,21 @@ export default async function SecondLevelPage({ params }: Props) {
                 <Breadcrumb items={[{ label: nav.name, href: `/dashboard/${navSlug}` }, { label: country.name }]} />
 
                 <div className="card">
-                    <span className="eyebrow mb-3">{country.name}</span>
-                    <h2 className="mb-1">Vyber oblast</h2>
+                    <div className="flex items-start justify-between gap-4">
+                        <div>
+                            <span className="eyebrow mb-3 block">{country.name}</span>
+                            <h2 className="mb-1">Vyber oblast</h2>
+                        </div>
+
+                        {(isAdmin || isEditor) && (
+                            <AddAreaModal
+                                navId={nav.id}
+                                countryId={country.id}
+                                navSlug={navSlug}
+                                countrySlug={secondSlug}
+                            />
+                        )}
+                    </div>
                 </div>
 
                 <ul className="list-links">

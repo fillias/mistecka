@@ -6,14 +6,17 @@ import type { SubmitEventHandler } from 'react';
 
 type Props = {
     navId: number;
+    countryId?: number; // number | undefined
     navSlug: string;
+    countrySlug?: string; // string | undefined
 };
 
-export default function AddCountryModal({ navId, navSlug }: Props) {
+export default function AddAreaModal({ navId, countryId, navSlug, countrySlug }: Props) {
+    console.log(navId, countryId, navSlug, countrySlug);
+
     const router = useRouter();
     const [open, setOpen] = useState(false);
     const [name, setName] = useState('');
-    const [code, setCode] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -23,16 +26,17 @@ export default function AddCountryModal({ navId, navSlug }: Props) {
         setError(null);
 
         try {
-            const res = await fetch('/api/add-country', {
+            const res = await fetch('/api/add-area', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     name: name.trim(),
-                    code: code.trim().toUpperCase(),
                     nav_id: navId,
-                    navSlug: navSlug
+                    country_id: countryId,
+                    navSlug: navSlug,
+                    countrySlug: countrySlug
                 })
             });
 
@@ -43,7 +47,6 @@ export default function AddCountryModal({ navId, navSlug }: Props) {
             }
 
             setName('');
-            setCode('');
             setOpen(false);
             router.refresh();
         } catch (err) {
@@ -60,7 +63,7 @@ export default function AddCountryModal({ navId, navSlug }: Props) {
                 onClick={() => setOpen(true)}
                 className="inline-flex shrink-0 items-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-800 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
             >
-                + Přidat zemi
+                + Přidat oblast
             </button>
 
             {open && (
@@ -70,7 +73,7 @@ export default function AddCountryModal({ navId, navSlug }: Props) {
                             <div>
                                 <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Nová země</h3>
                                 <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                                    Přidání nové země do sekce {navSlug}
+                                    Přidání nové oblasti do sekce {navSlug} {countrySlug && ` > ${countrySlug}`}
                                 </p>
                             </div>
 
@@ -87,40 +90,19 @@ export default function AddCountryModal({ navId, navSlug }: Props) {
                         <form onSubmit={onSubmit} className="space-y-4">
                             <div>
                                 <label
-                                    htmlFor="country-name"
+                                    htmlFor="area-name"
                                     className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-200"
                                 >
-                                    Název země
+                                    Název oblasti
                                 </label>
                                 <input
-                                    id="country-name"
+                                    id="area-name"
                                     type="text"
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
                                     required
-                                    placeholder="Např. Chorvatsko"
+                                    placeholder="Např. sever"
                                     className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-500 focus:ring-2 focus:ring-slate-300 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-slate-500 dark:focus:ring-slate-700"
-                                />
-                            </div>
-
-                            <div>
-                                <label
-                                    htmlFor="country-code"
-                                    className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-200"
-                                >
-                                    Kód země
-                                </label>
-                                <input
-                                    id="country-code"
-                                    type="text"
-                                    value={code}
-                                    onChange={(e) => setCode(e.target.value.toUpperCase())}
-                                    required
-                                    maxLength={2}
-                                    pattern="[A-Za-z]{2}"
-                                    title="Zadej 2písmenný kód země, např. CZ nebo HR"
-                                    placeholder="Např. HR"
-                                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 uppercase text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-500 focus:ring-2 focus:ring-slate-300 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-slate-500 dark:focus:ring-slate-700"
                                 />
                             </div>
 
