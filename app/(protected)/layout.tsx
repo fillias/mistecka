@@ -1,10 +1,10 @@
 import DashboardNav from '@/components/DashboardNav';
 import type { ReactNode } from 'react';
 import { getNavigationData } from '@/lib/db/nav';
+import 'flag-icons/css/flag-icons.min.css';
 
 export default async function ProtectedLayout({ children }: { children: React.ReactNode }) {
     const { mainNav } = await getNavigationData();
-    console.log('mainNav: ', mainNav);
 
     return (
         <>

@@ -15,6 +15,7 @@
     "@supabase/supabase-js": "^2.105.4",
     "blobshape": "^1.0.0",
     "bright": "^1.0.0",
+    "flag-icons": "^7.5.0",
     "markdown-to-jsx": "^7.7.16",
     "next": "^16.0.8",
     "react": "19.2.6",

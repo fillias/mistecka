@@ -4,6 +4,7 @@ import { getNavBySlug, getCountriesByNavId, getAreasById } from '@/lib/db/nav';
 import userInfo from '@/lib/userInfo';
 import AddCountryModal from '@/components/AddCountryModal';
 import AddAreaModal from '@/components/AddAreaModal';
+import CountryFlag from '@/components/CountryFlag';
 
 type Props = {
     params: Promise<{ navSlug: string }>;
@@ -39,9 +40,21 @@ export default async function NavPage({ params }: Props) {
                         <li key={country.id}>
                             <Link href={`/dashboard/${navSlug}/${country.id}-${country.slug}`} className="list-link">
                                 <div className="flex items-center justify-between gap-3">
-                                    <h2 className="text-base font-semibold" style={{ color: 'rgb(var(--text))' }}>
-                                        {country.name}
-                                    </h2>
+                                    <div className="flex min-w-0 items-center gap-3">
+                                        <CountryFlag
+                                            code={country.code}
+                                            name={country.name}
+                                            className="h-4 w-6 rounded-sm shadow-sm"
+                                        />
+
+                                        <h2
+                                            className="truncate text-base font-semibold"
+                                            style={{ color: 'rgb(var(--text))' }}
+                                        >
+                                            {country.name}
+                                        </h2>
+                                    </div>
+
                                     <span className="meta-text shrink-0">→</span>
                                 </div>
                             </Link>
@@ -52,7 +65,6 @@ export default async function NavPage({ params }: Props) {
         );
     }
 
-    // Loupenicko / Ruzne — přímo oblasti
     const areas = await getAreasById(nav.id, null);
 
     return (

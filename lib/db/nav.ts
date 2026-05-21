@@ -8,7 +8,7 @@ async function fetchNavigationData() {
 
     const [mainNavRes, countriesRes, areasRes] = await Promise.all([
         supabase.from('main_nav').select('id, name, slug, sort_order').order('sort_order', { ascending: true }),
-        supabase.from('country').select('id, name, slug, nav_id').order('name'),
+        supabase.from('country').select('id, name, code, slug, nav_id').order('name'),
         supabase.from('area').select('id, name, slug, nav_id, country_id').order('name')
     ]);
 
