@@ -2,12 +2,16 @@ import { notFound } from 'next/navigation';
 import Breadcrumb from '@/components/Breadcrumb';
 import PlaceCard from '@/components/PlaceCard';
 import { getNavBySlug, getCountryBySlug, getPlacesById, getAreaBySlug } from '@/lib/db/nav';
+import AddPlaceModal from '@/components/AddPlaceModal';
+import userInfo from '@/lib/userInfo';
 
 type Props = {
     params: Promise<{ navSlug: string; secondSlug: string; thirdSlug: string }>;
 };
 
 export default async function ThirdLevelPage({ params }: Props) {
+    const { isAdmin, isEditor } = await userInfo();
+
     const { navSlug, secondSlug, thirdSlug } = await params;
     const nav = await getNavBySlug(navSlug);
 
@@ -33,11 +37,26 @@ export default async function ThirdLevelPage({ params }: Props) {
             />
 
             <div className="card">
-                <span className="eyebrow mb-3">{country.name}</span>
-                <h1 className="mb-1">{area.name}</h1>
-                <p>
-                    {places.length} {places.length === 1 ? 'místo' : 'míst'} v této oblasti
-                </p>
+                <div className="flex items-start justify-between gap-4">
+                    <div>
+                        <span className="eyebrow mb-3 block">{country.name}</span>
+                        <h1 className="mb-1">{area.name}</h1>
+                        <p>
+                            {places.length} {places.length === 1 ? 'místo' : 'míst'} v této oblasti
+                        </p>
+                    </div>
+
+                    {(isAdmin || isEditor) && (
+                        <AddPlaceModal
+                            navId={nav.id}
+                            countryId={country.id}
+                            areaId={area.id}
+                            navSlug={navSlug}
+                            countrySlug={secondSlug}
+                            areaSlug={thirdSlug}
+                        />
+                    )}
+                </div>
             </div>
 
             {places.length === 0 ? (
