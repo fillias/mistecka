@@ -35,12 +35,11 @@ export async function POST(req: NextRequest) {
         if (!email) {
             return NextResponse.json({ ok: false, error: 'Missing email' }, { status: 400 });
         }
-
-        const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:8888';
+        const origin = req.nextUrl.origin;
         const supabaseAdmin = getSupabaseAdmin();
 
         const { data, error } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
-            redirectTo: `${appUrl}/invite/accept`
+            redirectTo: `${origin}/invite/accept`
         });
 
         if (error) {
