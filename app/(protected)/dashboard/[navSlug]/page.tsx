@@ -1,10 +1,12 @@
+import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
-import Link from 'next/link';
-import { getNavBySlug, getCountriesByNavId, getAreasById } from '@/lib/db/nav';
+import { getNavBySlug } from '@/lib/db/nav';
 import userInfo from '@/lib/userInfo';
 import AddCountryModal from '@/components/AddCountryModal';
 import AddAreaModal from '@/components/AddAreaModal';
-import CountryFlag from '@/components/CountryFlag';
+import CountriesList from './CountriesList';
+import AreasList from './AreasList';
+import Spinner from '@/app/(protected)/UI/Spinner';
 
 type Props = {
     params: Promise<{ navSlug: string }>;
@@ -19,81 +21,28 @@ export default async function NavPage({ params }: Props) {
 
     const hasCountries = nav.slug === 'parkovani';
 
-    if (hasCountries) {
-        const countries = await getCountriesByNavId(nav.id);
-
-        return (
-            <div className="page-stack">
-                <div className="card">
-                    <div className="flex items-start justify-between gap-4">
-                        <div>
-                            <span className="eyebrow mb-3 block">{nav.name}</span>
-                            <h2 className="mb-1">Vyber zemi</h2>
-                        </div>
-
-                        {(isAdmin || isEditor) && <AddCountryModal navId={nav.id} navSlug={navSlug} />}
-                    </div>
-                </div>
-
-                <ul className="list-links">
-                    {countries.map((country) => (
-                        <li key={country.id}>
-                            <Link href={`/dashboard/${navSlug}/${country.id}-${country.slug}`} className="list-link">
-                                <div className="flex items-center justify-between gap-3">
-                                    <div className="flex min-w-0 items-center gap-3">
-                                        <CountryFlag
-                                            code={country.code}
-                                            name={country.name}
-                                            className="h-4 w-6 rounded-sm shadow-sm"
-                                        />
-
-                                        <h2
-                                            className="truncate text-base font-semibold"
-                                            style={{ color: 'rgb(var(--text))' }}
-                                        >
-                                            {country.name}
-                                        </h2>
-                                    </div>
-
-                                    <span className="meta-text shrink-0">→</span>
-                                </div>
-                            </Link>
-                        </li>
-                    ))}
-                </ul>
-            </div>
-        );
-    }
-
-    const areas = await getAreasById(nav.id, null);
-
     return (
         <div className="page-stack">
             <div className="card">
                 <div className="flex items-start justify-between gap-4">
                     <div>
                         <span className="eyebrow mb-3 block">{nav.name}</span>
-                        <h2 className="mb-1">Vyber oblast</h2>
+                        <h2 className="mb-1">{hasCountries ? 'Vyber zemi' : 'Vyber oblast'}</h2>
                     </div>
 
-                    {(isAdmin || isEditor) && <AddAreaModal navId={nav.id} navSlug={navSlug} />}
+                    {hasCountries
+                        ? (isAdmin || isEditor) && <AddCountryModal navId={nav.id} navSlug={navSlug} />
+                        : (isAdmin || isEditor) && <AddAreaModal navId={nav.id} navSlug={navSlug} />}
                 </div>
             </div>
 
-            <ul className="list-links">
-                {areas.map((area) => (
-                    <li key={area.id}>
-                        <Link href={`/dashboard/${navSlug}/${area.id}-${area.slug}`} className="list-link">
-                            <div className="flex items-center justify-between gap-3">
-                                <h2 className="text-base font-semibold" style={{ color: 'rgb(var(--text))' }}>
-                                    {area.name}
-                                </h2>
-                                <span className="meta-text shrink-0">→</span>
-                            </div>
-                        </Link>
-                    </li>
-                ))}
-            </ul>
+            <Suspense fallback={<Spinner label={hasCountries ? 'Načítám země' : 'Načítám oblasti'} />}>
+                {hasCountries ? (
+                    <CountriesList navId={nav.id} navSlug={navSlug} />
+                ) : (
+                    <AreasList navId={nav.id} navSlug={navSlug} />
+                )}
+            </Suspense>
         </div>
     );
 }

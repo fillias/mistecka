@@ -48,3 +48,7 @@ export function slugify(value: string) {
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/(^-|-$)+/g, '');
 }
+
+export async function sleep(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}

@@ -1,10 +1,12 @@
 import { notFound } from 'next/navigation';
-import Link from 'next/link';
+import { Suspense } from 'react';
 import Breadcrumb from '@/components/Breadcrumb';
-import PlaceCard from '@/components/PlaceCard';
-import { getNavBySlug, getCountryBySlug, getAreaBySlug, getPlacesById, getAreasById } from '@/lib/db/nav';
 import AddAreaModal from '@/components/AddAreaModal';
 import userInfo from '@/lib/userInfo';
+import { getNavBySlug, getCountryBySlug, getAreaBySlug } from '@/lib/db/nav';
+import Spinner from '@/app/(protected)/UI/Spinner';
+import AreasList from './AreasList';
+import PlacesList from './PlacesList';
 
 type Props = {
     params: Promise<{ navSlug: string; secondSlug: string }>;
@@ -12,10 +14,8 @@ type Props = {
 
 export default async function SecondLevelPage({ params }: Props) {
     const { isAdmin, isEditor } = await userInfo();
-
     const { navSlug, secondSlug } = await params;
     const nav = await getNavBySlug(navSlug);
-    // console.log('nav: ', nav);
 
     if (!nav) notFound();
 
@@ -24,8 +24,6 @@ export default async function SecondLevelPage({ params }: Props) {
     if (hasCountries) {
         const country = await getCountryBySlug(secondSlug);
         if (!country) notFound();
-
-        const areas = await getAreasById(nav.id, country.id);
 
         return (
             <div className="page-stack">
@@ -49,32 +47,15 @@ export default async function SecondLevelPage({ params }: Props) {
                     </div>
                 </div>
 
-                <ul className="list-links">
-                    {areas.map((area) => (
-                        <li key={area.id}>
-                            <Link
-                                href={`/dashboard/${navSlug}/${secondSlug}/${area.id}-${area.slug}`}
-                                className="list-link"
-                            >
-                                <div className="flex items-center justify-between gap-3">
-                                    <h2 className="text-base font-semibold" style={{ color: 'rgb(var(--text))' }}>
-                                        {area.name}
-                                    </h2>
-                                    <span className="meta-text shrink-0">→</span>
-                                </div>
-                            </Link>
-                        </li>
-                    ))}
-                </ul>
+                <Suspense fallback={<Spinner label="Načítám oblasti" />}>
+                    <AreasList navId={nav.id} countryId={country.id} navSlug={navSlug} secondSlug={secondSlug} />
+                </Suspense>
             </div>
         );
     }
 
-    // Loupenicko / Ruzne — secondSlug je area → zobraz places jako cards
     const area = await getAreaBySlug(secondSlug);
     if (!area) notFound();
-
-    const places = await getPlacesById(nav.id, null, area.id);
 
     return (
         <div className="page-stack">
@@ -83,27 +64,11 @@ export default async function SecondLevelPage({ params }: Props) {
             <div className="card">
                 <span className="eyebrow mb-3">{nav.name}</span>
                 <h1 className="mb-1">{area.name}</h1>
-                <p>
-                    {places.length} {places.length === 1 ? 'místo' : 'míst'} v této oblasti
-                </p>
             </div>
 
-            {places.length === 0 ? (
-                <div className="card flex flex-col items-center py-12 text-center">
-                    <p className="mb-1 text-base font-medium" style={{ color: 'rgb(var(--text))' }}>
-                        Zatím žádná místa
-                    </p>
-                    <p>V této oblasti ještě nejsou přidána žádná místa.</p>
-                </div>
-            ) : (
-                <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    {places.map((place) => (
-                        <li key={place.id}>
-                            <PlaceCard place={place} />
-                        </li>
-                    ))}
-                </ul>
-            )}
+            <Suspense fallback={<Spinner label="Načítám místa" />}>
+                <PlacesList navId={nav.id} areaId={area.id} />
+            </Suspense>
         </div>
     );
 }
