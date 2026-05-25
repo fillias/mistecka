@@ -19,9 +19,32 @@ export default function InviteAcceptClient() {
             try {
                 const supabase = createClient();
 
-                const { data, error } = await supabase.auth.getUser();
+                const hash = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+                const query = new URLSearchParams(window.location.search);
 
-                if (error || !data.user) {
+                const access_token = hash.get('access_token') ?? query.get('access_token');
+                const refresh_token = hash.get('refresh_token') ?? query.get('refresh_token');
+
+                if (access_token && refresh_token) {
+                    const { error: sessionError } = await supabase.auth.setSession({
+                        access_token,
+                        refresh_token
+                    });
+
+                    if (sessionError) {
+                        setError(sessionError.message);
+                        return;
+                    }
+
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+
+                const {
+                    data: { user },
+                    error: userError
+                } = await supabase.auth.getUser();
+
+                if (userError || !user) {
                     setError('Pozvánka je neplatná, expirovala nebo nevznikla relace uživatele.');
                     return;
                 }
