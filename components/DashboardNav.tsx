@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import type { Tables } from '@/types/supabase';
+import LoadingLink from '@/components/LoadingLink';
 
 type DashboardNavProps = {
     items: Tables<'main_nav'>[];
@@ -34,14 +35,14 @@ export default function DashboardNav({ items }: DashboardNavProps) {
                 const isActive = pathname.startsWith(href);
 
                 return (
-                    <Link
+                    <LoadingLink
                         key={item.id}
                         href={href}
                         aria-current={isActive ? 'page' : undefined}
                         className={`nav-pill ${isActive ? 'nav-pill-active' : ''}`}
                     >
                         {item.name}
-                    </Link>
+                    </LoadingLink>
                 );
             })}
         </nav>

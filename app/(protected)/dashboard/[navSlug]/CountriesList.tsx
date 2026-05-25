@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getCountriesByNavId } from '@/lib/db/nav';
 import CountryFlag from '@/components/CountryFlag';
+import LoadingLink from '@/components/LoadingLink';
 
 type Props = {
     navId: string;
@@ -14,7 +15,7 @@ export default async function CountriesList({ navId, navSlug }: Props) {
         <ul className="list-links">
             {countries.map((country) => (
                 <li key={country.id}>
-                    <Link href={`/dashboard/${navSlug}/${country.id}-${country.slug}`} className="list-link">
+                    <LoadingLink href={`/dashboard/${navSlug}/${country.id}-${country.slug}`} className="list-link">
                         <div className="flex items-center justify-between gap-3">
                             <div className="flex min-w-0 items-center gap-3">
                                 <CountryFlag
@@ -30,7 +31,7 @@ export default async function CountriesList({ navId, navSlug }: Props) {
 
                             <span className="meta-text shrink-0">→</span>
                         </div>
-                    </Link>
+                    </LoadingLink>
                 </li>
             ))}
         </ul>
