@@ -2,9 +2,9 @@ import PlaceCard from '@/components/PlaceCard';
 import { getPlacesById } from '@/lib/db/nav';
 
 type Props = {
-    navId: string;
-    countryId: string;
-    areaId: string;
+    navId: number;
+    countryId: number;
+    areaId: number;
 };
 
 export default async function PlacesSection({ navId, countryId, areaId }: Props) {

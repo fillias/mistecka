@@ -2,8 +2,8 @@ import PlaceCard from '@/components/PlaceCard';
 import { getPlacesById } from '@/lib/db/nav';
 
 type Props = {
-    navId: string;
-    areaId: string;
+    navId: number;
+    areaId: number;
 };
 
 export default async function PlacesList({ navId, areaId }: Props) {
