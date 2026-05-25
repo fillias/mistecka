@@ -6,7 +6,7 @@ import AddCountryModal from '@/components/AddCountryModal';
 import AddAreaModal from '@/components/AddAreaModal';
 import CountriesList from './CountriesList';
 import AreasList from './AreasList';
-import Spinner from '@/app/(protected)/UI/Spinner';
+import Spinner from '@/app/UI/Spinner';
 
 type Props = {
     params: Promise<{ navSlug: string }>;

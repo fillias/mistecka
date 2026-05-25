@@ -4,7 +4,7 @@ import Breadcrumb from '@/components/Breadcrumb';
 import AddAreaModal from '@/components/AddAreaModal';
 import userInfo from '@/lib/userInfo';
 import { getNavBySlug, getCountryBySlug, getAreaBySlug } from '@/lib/db/nav';
-import Spinner from '@/app/(protected)/UI/Spinner';
+import Spinner from '@/app/UI/Spinner';
 import AreasList from './AreasList';
 import PlacesList from './PlacesList';
 

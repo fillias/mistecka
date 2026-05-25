@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 import Breadcrumb from '@/components/Breadcrumb';
 import AddPlaceModal from '@/components/AddPlaceModal';
 import userInfo from '@/lib/userInfo';
-import Spinner from '@/app/(protected)/UI/Spinner';
+import Spinner from '@/app/UI/Spinner';
 import { getNavBySlug, getCountryBySlug, getAreaBySlug } from '@/lib/db/nav';
 import PlacesSection from './PlacesSection';
 
