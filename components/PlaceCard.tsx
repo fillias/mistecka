@@ -1,11 +1,14 @@
 // src/components/PlaceCard.tsx
 import type { Tables } from '@/types/supabase';
 
+import { createMapyCzLink } from '@/lib/utils';
+
 type PlaceCardProps = {
     place: Tables<'place'>;
 };
 
 export default function PlaceCard({ place }: PlaceCardProps) {
+    console.log('place.place_gps_coords: ', place.place_gps_coords);
     return (
         <article className="card flex h-full flex-col gap-3">
             {/* Obrázek */}
@@ -19,7 +22,6 @@ export default function PlaceCard({ place }: PlaceCardProps) {
                     />
                 </div>
             )}
-
             {/* Hlavička */}
             <div className="flex items-start justify-between gap-2">
                 <h2 className="text-base font-semibold leading-snug" style={{ color: 'rgb(var(--text))' }}>
@@ -27,7 +29,6 @@ export default function PlaceCard({ place }: PlaceCardProps) {
                 </h2>
                 {place.place_type && <span className="eyebrow shrink-0">{place.place_type}</span>}
             </div>
-
             {/* Popis */}
             {place.place_description && <p className="line-clamp-3 text-sm leading-6">{place.place_description}</p>}
 
@@ -35,13 +36,13 @@ export default function PlaceCard({ place }: PlaceCardProps) {
             {place.place_gps_coords && (
                 <div className="mt-auto pt-2" style={{ borderTop: '1px solid rgb(var(--border))' }}>
                     <a
-                        href={`https://maps.google.com/?q=${place.place_gps_coords}`}
+                        href={`https://mapy.com/cs/zakladni?source=coor&${createMapyCzLink(place.place_gps_coords)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="btn btn-ghost !min-h-0 !px-0 !py-1 text-xs"
                         style={{ color: 'rgb(var(--primary))' }}
                     >
-                        📍 Zobrazit na mapě
+                        📍 Zobrazit na Mapy.cz
                     </a>
                 </div>
             )}
