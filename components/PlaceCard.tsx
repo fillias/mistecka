@@ -1,17 +1,28 @@
-// src/components/PlaceCard.tsx
-import type { Tables } from '@/types/supabase';
+'use client';
 
+import type { Tables } from '@/types/supabase';
 import { createMapyCzLink } from '@/lib/utils';
 
 type PlaceCardProps = {
     place: Tables<'place'>;
+    onOpenDetail: () => void;
 };
 
-export default function PlaceCard({ place }: PlaceCardProps) {
-    console.log('place.place_gps_coords: ', place.place_gps_coords);
+export default function PlaceCard({ place, onOpenDetail }: PlaceCardProps) {
     return (
-        <article className="card flex h-full flex-col gap-3">
-            {/* Obrázek */}
+        <article
+            className="card flex h-full cursor-pointer flex-col gap-3"
+            onClick={onOpenDetail}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onOpenDetail();
+                }
+            }}
+            aria-label={`Zobrazit detail místa ${place.place_name}`}
+        >
             {place.place_image_url && (
                 <div className="overflow-hidden rounded-xl" style={{ aspectRatio: '16/9' }}>
                     <img
@@ -22,17 +33,16 @@ export default function PlaceCard({ place }: PlaceCardProps) {
                     />
                 </div>
             )}
-            {/* Hlavička */}
+
             <div className="flex items-start justify-between gap-2">
                 <h2 className="text-base font-semibold leading-snug" style={{ color: 'rgb(var(--text))' }}>
                     {place.place_name}
                 </h2>
                 {place.place_type && <span className="eyebrow shrink-0">{place.place_type}</span>}
             </div>
-            {/* Popis */}
+
             {place.place_description && <p className="line-clamp-3 text-sm leading-6">{place.place_description}</p>}
 
-            {/* GPS odkaz — zatlačen na konec karty */}
             {place.place_gps_coords && (
                 <div className="mt-auto pt-2" style={{ borderTop: '1px solid rgb(var(--border))' }}>
                     <a
@@ -41,6 +51,7 @@ export default function PlaceCard({ place }: PlaceCardProps) {
                         rel="noopener noreferrer"
                         className="btn btn-ghost !min-h-0 !px-0 !py-1 text-xs"
                         style={{ color: 'rgb(var(--primary))' }}
+                        onClick={(e) => e.stopPropagation()}
                     >
                         📍 Zobrazit na Mapy.cz
                     </a>

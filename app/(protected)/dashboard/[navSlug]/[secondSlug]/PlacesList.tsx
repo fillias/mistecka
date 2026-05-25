@@ -1,5 +1,6 @@
-import PlaceCard from '@/components/PlaceCard';
+import PlaceCardWithDetail from '@/components/PlaceCardWirhDetail';
 import { getPlacesById } from '@/lib/db/nav';
+import userInfo from '@/lib/userInfo';
 
 type Props = {
     navId: number;
@@ -7,6 +8,7 @@ type Props = {
 };
 
 export default async function PlacesList({ navId, areaId }: Props) {
+    const { isAdmin, isEditor } = await userInfo();
     const places = await getPlacesById(navId, null, areaId);
 
     if (places.length === 0) {
@@ -24,7 +26,7 @@ export default async function PlacesList({ navId, areaId }: Props) {
         <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {places.map((place) => (
                 <li key={place.id}>
-                    <PlaceCard place={place} />
+                    <PlaceCardWithDetail place={place} canManage={isAdmin || isEditor} />{' '}
                 </li>
             ))}
         </ul>
