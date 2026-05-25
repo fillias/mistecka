@@ -101,26 +101,58 @@ export default function InviteAcceptClient() {
 
     return (
         <form onSubmit={handleSubmit}>
-            <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Nové heslo"
-                minLength={8}
-                required
-            />
-            <input
-                type="password"
-                value={passwordConfirm}
-                onChange={(e) => setPasswordConfirm(e.target.value)}
-                placeholder="Potvrzení hesla"
-                minLength={8}
-                required
-            />
-            {error && <p>{error}</p>}
-            <button type="submit" disabled={loading}>
-                {loading ? 'Ukládám…' : 'Dokončit registraci'}
-            </button>
+            <div className="page-stack">
+                <div className="text-center">
+                    <h1 className="mb-2">Dokončení registrace</h1>
+                    <p>Nastav si heslo pro svůj nový účet.</p>
+                </div>
+
+                <div className="grid gap-2">
+                    <label htmlFor="password" className="text-sm font-medium" style={{ color: 'rgb(var(--text))' }}>
+                        Nové heslo
+                    </label>
+                    <input
+                        id="password"
+                        type="password"
+                        autoComplete="new-password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Alespoň 8 znaků"
+                        minLength={8}
+                        required
+                        className="input"
+                        aria-describedby={error ? 'invite-error' : undefined}
+                        aria-invalid={error ? true : undefined}
+                    />
+                </div>
+
+                <div className="grid gap-2">
+                    <label
+                        htmlFor="password-confirm"
+                        className="text-sm font-medium"
+                        style={{ color: 'rgb(var(--text))' }}
+                    >
+                        Potvrzení hesla
+                    </label>
+                    <input
+                        id="password-confirm"
+                        type="password"
+                        autoComplete="new-password"
+                        value={passwordConfirm}
+                        onChange={(e) => setPasswordConfirm(e.target.value)}
+                        placeholder="Zopakuj heslo"
+                        minLength={8}
+                        required
+                        className="input"
+                        aria-describedby={error ? 'invite-error' : undefined}
+                        aria-invalid={error ? true : undefined}
+                    />
+                </div>
+                {error && <p>{error}</p>}
+                <button type="submit" disabled={loading} className="btn btn-primary btn-lg w-full">
+                    {loading ? 'Ukládám…' : 'Dokončit registraci'}
+                </button>
+            </div>
         </form>
     );
 }
