@@ -3,8 +3,6 @@ import Image from 'next/image';
 import userInfo from '@/lib/userInfo';
 
 export default async function Page() {
-    const { isAdmin, email } = await userInfo();
-
     return (
         <section className="flex min-h-[70vh] items-center justify-center py-10 sm:min-h-[80vh] sm:py-16">
             <div className="flex w-full max-w-md flex-col items-center text-center">
