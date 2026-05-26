@@ -53,7 +53,7 @@ export function NavigationOverlayProvider({ children }: { children: ReactNode })
             {children}
 
             {visible && (
-                <div className="pointer-events-none fixed inset-0 z-[120] flex items-center justify-center bg-black/20 ">
+                <div className="pointer-events-none fixed inset-0 z-[120] flex items-end justify-center pb-6 sm:pb-8">
                     <Spinner label="Načítám…" />
                 </div>
             )}
