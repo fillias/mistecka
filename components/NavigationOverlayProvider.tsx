@@ -13,7 +13,10 @@ const NavigationOverlayContext = createContext<NavigationOverlayContextValue | n
 
 export function NavigationOverlayProvider({ children }: { children: ReactNode }) {
     const pathname = usePathname();
-    const searchParams = useSearchParams();
+
+    // reseni kvuli buildu abych nemusel cely Provider obalit suspense
+    // pokud budou potreba searchParams, vyresit jinak
+    const searchParams = null; // useSearchParams();
 
     const [visible, setVisible] = useState(false);
     const timerRef = useRef<number | null>(null);
