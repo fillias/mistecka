@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import type { Tables } from '@/types/supabase';
-import { createMapyCzLink } from '@/lib/utils';
+import { createMapyCzLink, createGoogleMapsLink } from '@/lib/utils';
 
 type Props = {
     place: Tables<'place'>;
@@ -13,10 +13,6 @@ type Props = {
     deleteLoading?: boolean;
     deleteError?: string | null;
 };
-
-function createGoogleMapsLink(coords: string) {
-    return `https://www.google.com/maps?q=${encodeURIComponent(coords)}`;
-}
 
 export default function PlaceDetail({
     place,
@@ -130,7 +126,7 @@ export default function PlaceDetail({
                             <div className="flex flex-col gap-3 sm:flex-row">
                                 {place.place_gps_coords && (
                                     <a
-                                        href={`https://mapy.com/cs/zakladni?source=coor&${createMapyCzLink(place.place_gps_coords)}`}
+                                        href={createMapyCzLink(place.place_gps_coords)}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="btn btn-primary"

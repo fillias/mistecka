@@ -46,7 +46,7 @@ export default function PlaceCard({ place, onOpenDetail }: PlaceCardProps) {
             {place.place_gps_coords && (
                 <div className="mt-auto pt-2" style={{ borderTop: '1px solid rgb(var(--border))' }}>
                     <a
-                        href={`https://mapy.com/cs/zakladni?source=coor&${createMapyCzLink(place.place_gps_coords)}`}
+                        href={createMapyCzLink(place.place_gps_coords)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="btn btn-ghost !min-h-0 !px-0 !py-1 text-xs"
