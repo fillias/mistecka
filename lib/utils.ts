@@ -53,13 +53,33 @@ export async function sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export function createMapyCzLink(input: string): string {
-    const match = input.match(/^\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*$/);
+const modifyInsertedGpsCoors = (coors) => {
+    const input = coors.trim();
+
+    const match = input.match(/^\s*(-?\d+(?:\.\d+)?)([NS])?\s*,\s*(-?\d+(?:\.\d+)?)([EW])?\s*$/i);
 
     if (!match) {
-        throw new Error('Invalid GPS format. Expected: 50.483900, 13.154500');
+        throw new Error('Invalid GPS format. Expected "50.483900, 13.154500" or "50.483900N, 13.154500E"');
     }
 
-    const [, lat, lng] = match;
-    return `id=${lng}%2C${lat}&x=${lng}&y=${lat}&z=13`;
+    let [, lat, latDir, lng, lngDir] = match;
+
+    let latitude = parseFloat(lat);
+    let longitude = parseFloat(lng);
+
+    if (latDir) latitude = latDir.toUpperCase() === 'S' ? -Math.abs(latitude) : Math.abs(latitude);
+    if (lngDir) longitude = lngDir.toUpperCase() === 'W' ? -Math.abs(longitude) : Math.abs(longitude);
+
+    return { textCoords: `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`, latitude, longitude };
+};
+
+export function createMapyCzLink(input: string): string {
+    const { longitude, latitude } = modifyInsertedGpsCoors(input);
+
+    return `https://mapy.com/cs/turisticka?source=coor&id=${longitude}%2C${latitude}&x=${longitude}&y=${latitude}&z=13`;
+}
+
+export function createGoogleMapsLink(coords: string) {
+    const { textCoords } = modifyInsertedGpsCoors(coords);
+    return `https://www.google.com/maps?q=${encodeURIComponent(textCoords)}`;
 }
