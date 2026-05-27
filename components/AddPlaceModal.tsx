@@ -30,7 +30,18 @@ export default function AddPlaceModal({ navId, countryId, areaId, navSlug, count
     const [error, setError] = useState<string | null>(null);
 
     const parkingTypes = ['parkoviště', 'kemp', 'stání se spaním', 'stání bez spaní', 'hřbitov', 'pláž', 'jiné'];
-    const loupenickoTypes = ['jablíčka', 'švestky', 'třešně', 'lusky', 'hrušky', 'jiné'];
+    const loupenickoTypes = [
+        'jablíčka',
+        'švestky',
+        'třešně',
+        'lusky',
+        'hrušky',
+        'ořechy',
+        'houby',
+        'borůvky',
+        'brusinky',
+        'jiné'
+    ];
     let options;
 
     switch (navSlug) {
