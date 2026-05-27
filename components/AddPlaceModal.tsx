@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { SubmitEventHandler } from 'react';
+import { isValidGpsString, removeIdFromSlugs } from '@/lib/utils';
 
 type Props = {
     navId: number;
@@ -14,19 +15,47 @@ type Props = {
 };
 
 export default function AddPlaceModal({ navId, countryId, areaId, navSlug, countrySlug, areaSlug }: Props) {
+    [navSlug, areaSlug] = removeIdFromSlugs([navSlug, areaSlug]);
+    countrySlug && ([countrySlug] = removeIdFromSlugs([countrySlug]));
+
     const router = useRouter();
     const [open, setOpen] = useState(false);
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [type, setType] = useState('');
+    const [otherType, setOtherType] = useState('');
+    const [gps, setGPS] = useState('');
     const [imageUrl, setImageUrl] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    const parkingTypes = ['parkoviště', 'kemp', 'stání se spaním', 'stání bez spaní', 'hřbitov', 'jiné'];
+    const loupenickoTypes = ['jablíčka', 'švestky', 'hrušky', 'lusky', 'třešně', 'jiné'];
+    let options;
+
+    switch (navSlug) {
+        case 'parkovani':
+            options = parkingTypes;
+            break;
+        case 'loupenicko':
+            options = loupenickoTypes;
+            break;
+        default:
+            options = null;
+    }
 
     const onSubmit: SubmitEventHandler<HTMLFormElement> = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
+
+        if (!isValidGpsString(gps)) {
+            alert('Špatný formát GPS');
+            setLoading(false);
+            return;
+        }
+
+        const finalType = options ? (type === 'jiné' ? otherType : type) : otherType;
 
         try {
             const res = await fetch('/api/add-place', {
@@ -36,12 +65,13 @@ export default function AddPlaceModal({ navId, countryId, areaId, navSlug, count
                 },
                 body: JSON.stringify({
                     name: name.trim(),
-                    nav_id: navId,
-                    area_id: areaId,
-                    country_id: countryId,
-                    navSlug: navSlug,
-                    countrySlug: countrySlug,
-                    areaSlug: areaSlug
+                    description: description.trim(),
+                    navId,
+                    areaId,
+                    countryId,
+                    type: finalType,
+                    gps,
+                    imageUrl
                 })
             });
 
@@ -52,6 +82,11 @@ export default function AddPlaceModal({ navId, countryId, areaId, navSlug, count
             }
 
             setName('');
+            setType('');
+            setDescription('');
+            setGPS('');
+            setType('');
+            setImageUrl('');
             setOpen(false);
             router.refresh();
         } catch (err) {
@@ -117,13 +152,51 @@ export default function AddPlaceModal({ navId, countryId, areaId, navSlug, count
                                 >
                                     Typ místa
                                 </label>
+
+                                {options && (
+                                    <select
+                                        id="place-type"
+                                        value={type}
+                                        onChange={(e) => setType(e.target.value)}
+                                        required
+                                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-300 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:focus:border-slate-500 dark:focus:ring-slate-700 mb-3"
+                                    >
+                                        <option value="" disabled>
+                                            Vyber typ místa
+                                        </option>
+                                        {options?.map((option) => (
+                                            <option key={option} value={option}>
+                                                {option}
+                                            </option>
+                                        ))}
+                                    </select>
+                                )}
+
+                                {(type === 'jiné' || !options) && (
+                                    <input
+                                        id="place-type-other"
+                                        type="text"
+                                        value={otherType}
+                                        onChange={(e) => setOtherType(e.target.value)}
+                                        required
+                                        placeholder="Zadej vlastní typ místa"
+                                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-500 focus:ring-2 focus:ring-slate-300 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-slate-500 dark:focus:ring-slate-700 mb-3"
+                                    />
+                                )}
+
+                                <label
+                                    htmlFor="place-gps"
+                                    className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-200"
+                                >
+                                    GPS souřadnice
+                                </label>
                                 <input
-                                    id="place-type"
+                                    id="place-gps"
                                     type="text"
-                                    value={type}
-                                    onChange={(e) => setType(e.target.value)}
+                                    value={gps}
+                                    onChange={(e) => setGPS(e.target.value)}
                                     required
-                                    placeholder="Např. parkoviště"
+                                    placeholder="zkopíruj z Mapy.cz"
                                     className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-500 focus:ring-2 focus:ring-slate-300 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-slate-500 dark:focus:ring-slate-700 mb-3"
                                 />
 

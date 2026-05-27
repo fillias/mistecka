@@ -13,18 +13,35 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Nemáte oprávnění.' }, { status: 403 });
         }
 
+        /*
+                body: JSON.stringify({
+                    name: name.trim(),
+                    description: description.trim(),
+                    navId,
+                    areaId,
+                    countryId,
+                    navSlug,
+                    countrySlug,
+                    areaSlug,
+                    type,
+                    gps,
+                    imageUrl
+                })
+        */
+
         const body = await req.json();
         const navSlug = String(body.navSlug);
-        const countrySlug = String(body.countrySlug);
-        const areaSlug = String(body.areaSlug);
+        // const countrySlug = String(body.countrySlug);
+        // const areaSlug = String(body.areaSlug);
+        // const slug = slugify(name);
         const name = String(body.name ?? '').trim();
-        const type = String(body.type ?? '').trim();
+        const type = String(body.type);
+        const gps = String(body.gps ?? '').trim();
         const description = String(body.description ?? '').trim();
         const imageUrl = String(body.imageUrl ?? '').trim();
-        const navId = Number(body.nav_id);
-        const countryId = Number(body.country_id) || null;
-        const areaId = Number(body.area_id);
-        const slug = slugify(name);
+        const navId = Number(body.navId);
+        const countryId = Number(body.countryId) || null;
+        const areaId = Number(body.areaId);
 
         if (!name || !navId) {
             return NextResponse.json({ error: 'Chybí povinná data.' }, { status: 400 });
@@ -38,6 +55,7 @@ export async function POST(req: NextRequest) {
                 place_name: name,
                 place_type: type,
                 place_description: description,
+                place_gps_coords: gps,
                 place_image_url: imageUrl,
                 nav_id: navId,
                 country_id: countryId,

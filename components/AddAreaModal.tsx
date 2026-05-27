@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { SubmitEventHandler } from 'react';
+import { removeIdFromSlugs } from '@/lib/utils';
 
 type Props = {
     navId: number;
@@ -71,7 +72,8 @@ export default function AddAreaModal({ navId, countryId, navSlug, countrySlug }:
                             <div>
                                 <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Nová země</h3>
                                 <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                                    Přidání nové oblasti do sekce {navSlug} {countrySlug && ` > ${countrySlug}`}
+                                    Přidání nové oblasti do sekce {removeIdFromSlugs([navSlug]).toString()}
+                                    {countrySlug && ` > ${removeIdFromSlugs([countrySlug]).toString()}`}
                                 </p>
                             </div>
 

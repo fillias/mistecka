@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { SubmitEventHandler } from 'react';
+import { removeIdFromSlugs } from '@/lib/utils';
 
 type Props = {
     navId: number;
@@ -70,7 +71,7 @@ export default function AddCountryModal({ navId, navSlug }: Props) {
                             <div>
                                 <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Nová země</h3>
                                 <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                                    Přidání nové země do sekce {navSlug}
+                                    Přidání nové země do sekce {removeIdFromSlugs([navSlug]).toString()}
                                 </p>
                             </div>
 

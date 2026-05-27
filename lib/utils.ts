@@ -83,3 +83,35 @@ export function createGoogleMapsLink(coords: string) {
     const { textCoords } = modifyInsertedGpsCoors(coords);
     return `https://www.google.com/maps?q=${encodeURIComponent(textCoords)}`;
 }
+
+export function isValidGpsString(input: string) {
+    if (typeof input !== 'string') return false;
+
+    const s = input.trim();
+
+    // Format 1: 50.0466081N, 14.3408844E
+    const directional = /^(\d+(?:\.\d+)?)([NS]),\s*(\d+(?:\.\d+)?)([EW])$/i;
+
+    // Format 2: 50.09863956608133, 14.421410725312871
+    const decimal = /^([+-]?\d+(?:\.\d+)?),\s*([+-]?\d+(?:\.\d+)?)$/;
+
+    let m = s.match(directional);
+    if (m) {
+        const lat = Number(m[1]);
+        const lon = Number(m[3]);
+        return lat >= 0 && lat <= 90 && lon >= 0 && lon <= 180;
+    }
+
+    m = s.match(decimal);
+    if (m) {
+        const lat = Number(m[1]);
+        const lon = Number(m[2]);
+        return lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180;
+    }
+
+    return false;
+}
+
+export function removeIdFromSlugs(strings: string[]): string[] {
+    return strings.map((str) => str.replace(/^\d+-/, ''));
+}
