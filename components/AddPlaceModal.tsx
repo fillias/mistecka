@@ -29,8 +29,8 @@ export default function AddPlaceModal({ navId, countryId, areaId, navSlug, count
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const parkingTypes = ['parkoviště', 'kemp', 'stání se spaním', 'stání bez spaní', 'hřbitov', 'jiné'];
-    const loupenickoTypes = ['jablíčka', 'švestky', 'hrušky', 'lusky', 'třešně', 'jiné'];
+    const parkingTypes = ['parkoviště', 'kemp', 'stání se spaním', 'stání bez spaní', 'hřbitov', 'pláž', 'jiné'];
+    const loupenickoTypes = ['jablíčka', 'švestky', 'třešně', 'lusky', 'hrušky', 'jiné'];
     let options;
 
     switch (navSlug) {
@@ -111,10 +111,13 @@ export default function AddPlaceModal({ navId, countryId, areaId, navSlug, count
                     <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl dark:border-slate-800 dark:bg-slate-900">
                         <div className="mb-5 flex items-start justify-between gap-4">
                             <div>
-                                <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Nové místo</h3>
                                 <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                                    Přidání nového místa do sekce {navSlug} {countrySlug && ` > ${countrySlug}`}{' '}
-                                    {` > ${areaSlug}`}
+                                    Nové místo do sekce{' '}
+                                    <strong>
+                                        {' '}
+                                        {navSlug} {countrySlug && ` > ${countrySlug}`}
+                                        {` > ${areaSlug}`}
+                                    </strong>
                                 </p>
                             </div>
 
