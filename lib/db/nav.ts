@@ -67,7 +67,7 @@ export async function getPlacesById(navId: number, countryId: number | null, are
 
     query = countryId === null ? query.is('country_id', null) : query.eq('country_id', countryId);
 
-    const { data, error } = await query.order('place_name');
+    const { data, error } = await query.order('created_at', { ascending: false });
 
     if (error) throw error;
     return data ?? [];
