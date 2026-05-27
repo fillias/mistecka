@@ -24,6 +24,7 @@ export default function PlaceDetail({
     deleteError = null
 }: Props) {
     const [imageOpen, setImageOpen] = useState(false);
+    const [gpsCopied, setGpsCopied] = useState(false);
     const closeButtonRef = useRef<HTMLButtonElement | null>(null);
 
     useEffect(() => {
@@ -45,6 +46,18 @@ export default function PlaceDetail({
             document.removeEventListener('keydown', handleKeyDown);
         };
     }, [imageOpen, onClose]);
+
+    const handleCopyGps = async () => {
+        if (!place.place_gps_coords) return;
+
+        try {
+            await navigator.clipboard.writeText(place.place_gps_coords);
+            setGpsCopied(true);
+            window.setTimeout(() => setGpsCopied(false), 1500);
+        } catch (error) {
+            console.error('Failed to copy GPS coords:', error);
+        }
+    };
 
     return (
         <>
@@ -123,51 +136,68 @@ export default function PlaceDetail({
                                 )}
                             </div>
 
-                            <div className="flex flex-row gap-3">
+                            <div className="flex flex-row items-center gap-3">
                                 {place.place_gps_coords && (
-                                    <div
-                                        className="flex flex-row items-center gap-3"
-                                        role="group"
-                                        aria-label="Map links"
-                                    >
-                                        <a
-                                            href={createMapyCzLink(place.place_gps_coords)}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="inline-flex h-11 w-11 items-center justify-center  transition hover:scale-[1.03]"
-                                            aria-label="Open in Mapy.cz"
-                                            title="Open in Mapy.cz"
+                                    <>
+                                        <div
+                                            className="flex flex-row items-center gap-3"
+                                            role="group"
+                                            aria-label="Map links"
                                         >
-                                            <img
-                                                src="/images/Mapycz_icon.svg"
-                                                alt=""
-                                                aria-hidden="true"
-                                                className="h-10 w-auto"
-                                            />
-                                        </a>
+                                            <a
+                                                href={createMapyCzLink(place.place_gps_coords)}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="inline-flex h-11 w-11 items-center justify-center transition hover:scale-[1.03]"
+                                                aria-label="Open in Mapy.cz"
+                                                title="Open in Mapy.cz"
+                                            >
+                                                <img
+                                                    src="/images/Mapycz_icon.svg"
+                                                    alt=""
+                                                    aria-hidden="true"
+                                                    className="h-10 w-auto"
+                                                />
+                                            </a>
 
-                                        <a
-                                            href={createGoogleMapsLink(place.place_gps_coords)}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="inline-flex h-11 w-11 items-center justify-center  transition hover:scale-[1.03]"
-                                            aria-label="Open in Google Maps"
-                                            title="Open in Google Maps"
+                                            <a
+                                                href={createGoogleMapsLink(place.place_gps_coords)}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="inline-flex h-11 w-11 items-center justify-center transition hover:scale-[1.03]"
+                                                aria-label="Open in Google Maps"
+                                                title="Open in Google Maps"
+                                            >
+                                                <img
+                                                    src="/images/Google_Maps_icon.svg"
+                                                    alt=""
+                                                    aria-hidden="true"
+                                                    className="h-10 w-auto"
+                                                />
+                                            </a>
+                                        </div>
+
+                                        <button
+                                            type="button"
+                                            onClick={handleCopyGps}
+                                            className="ml-auto inline-flex h-11 items-center justify-center rounded-full border px-4 text-sm font-medium transition hover:bg-black/5"
+                                            style={{
+                                                borderColor: 'rgb(var(--border))',
+                                                backgroundColor: gpsCopied ? 'rgb(var(--surface-2))' : 'transparent',
+                                                color: 'rgb(var(--text))'
+                                            }}
+                                            aria-label="Zkopírovat GPS souřadnice"
+                                            title="Zkopírovat GPS souřadnice"
                                         >
-                                            <img
-                                                src="/images/Google_Maps_icon.svg"
-                                                alt=""
-                                                aria-hidden="true"
-                                                className="h-10 w-auto"
-                                            />
-                                        </a>
-                                    </div>
+                                            {gpsCopied ? 'Zkopírováno' : 'Zkopírovat GPS'}
+                                        </button>
+                                    </>
                                 )}
                             </div>
 
                             {canManage && (
                                 <div
-                                    className="flex items-center gap-2 border-t pt-4"
+                                    className="flex  gap-2 border-t pt-4"
                                     style={{ borderColor: 'rgb(var(--border))' }}
                                     role="group"
                                     aria-label="Akce pro správu místa"
@@ -175,7 +205,7 @@ export default function PlaceDetail({
                                     <button
                                         type="button"
                                         onClick={() => onEdit?.(place)}
-                                        className="inline-flex h-11 w-11 items-center justify-center rounded-full border transition hover:bg-black/5"
+                                        className="inline-flex h-11 w-18 items-center justify-center rounded-full border transition hover:bg-black/5"
                                         style={{ borderColor: 'rgb(var(--border))', color: 'rgb(var(--text))' }}
                                         aria-label="Upravit místo"
                                         title="Upravit místo"
@@ -199,8 +229,12 @@ export default function PlaceDetail({
                                     <button
                                         type="button"
                                         onClick={() => onDelete?.(place)}
-                                        className="inline-flex h-11 w-11 items-center justify-center rounded-full border transition hover:bg-red-500/10 disabled:opacity-50"
-                                        style={{ borderColor: 'rgb(var(--border))', color: 'rgb(var(--text))' }}
+                                        className="ml-auto inline-flex h-11 w-11 items-center justify-center rounded-full border transition hover:bg-red-500/10 disabled:opacity-50"
+                                        style={{
+                                            borderColor: 'rgb(var(--danger) / 0.35)',
+                                            color: 'rgb(var(--danger))',
+                                            backgroundColor: 'rgb(var(--danger) / 0.06)'
+                                        }}
                                         aria-label="Smazat místo"
                                         title="Smazat místo"
                                         disabled={deleteLoading}
