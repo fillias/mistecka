@@ -123,27 +123,45 @@ export default function PlaceDetail({
                                 )}
                             </div>
 
-                            <div className="flex flex-col gap-3 sm:flex-row">
+                            <div className="flex flex-row gap-3">
                                 {place.place_gps_coords && (
-                                    <a
-                                        href={createMapyCzLink(place.place_gps_coords)}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="btn btn-primary"
+                                    <div
+                                        className="flex flex-row items-center gap-3"
+                                        role="group"
+                                        aria-label="Map links"
                                     >
-                                        Otevřít v Mapy.cz
-                                    </a>
-                                )}
+                                        <a
+                                            href={createMapyCzLink(place.place_gps_coords)}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex h-11 w-11 items-center justify-center  transition hover:scale-[1.03]"
+                                            aria-label="Open in Mapy.cz"
+                                            title="Open in Mapy.cz"
+                                        >
+                                            <img
+                                                src="/images/Mapycz_icon.svg"
+                                                alt=""
+                                                aria-hidden="true"
+                                                className="h-10 w-auto"
+                                            />
+                                        </a>
 
-                                {place.place_gps_coords && (
-                                    <a
-                                        href={createGoogleMapsLink(place.place_gps_coords)}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="btn"
-                                    >
-                                        Otevřít v Google Mapách
-                                    </a>
+                                        <a
+                                            href={createGoogleMapsLink(place.place_gps_coords)}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex h-11 w-11 items-center justify-center  transition hover:scale-[1.03]"
+                                            aria-label="Open in Google Maps"
+                                            title="Open in Google Maps"
+                                        >
+                                            <img
+                                                src="/images/Google_Maps_icon.svg"
+                                                alt=""
+                                                aria-hidden="true"
+                                                className="h-10 w-auto"
+                                            />
+                                        </a>
+                                    </div>
                                 )}
                             </div>
 
@@ -236,7 +254,7 @@ export default function PlaceDetail({
                             borderColor: 'rgb(var(--border))',
                             color: 'rgb(var(--text))'
                         }}
-                        aria-label="Zavřít obrázek"
+                        aria-label="Close image"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -255,21 +273,25 @@ export default function PlaceDetail({
                     </button>
 
                     <div
-                        className="flex h-[100dvh] w-full items-center justify-center overflow-auto p-4"
+                        className="h-[100dvh] w-full overflow-auto p-4"
                         style={{
-                            touchAction: 'pinch-zoom',
+                            touchAction: 'pan-x pan-y pinch-zoom',
                             WebkitOverflowScrolling: 'touch'
                         }}
                     >
-                        <img
-                            src={place.place_image_url}
-                            alt={place.place_name}
-                            className="block max-h-full max-w-full object-contain"
-                            style={{
-                                width: 'auto',
-                                height: 'auto'
-                            }}
-                        />
+                        <div className="flex min-h-full min-w-full items-center justify-center">
+                            <img
+                                src={place.place_image_url}
+                                alt={place.place_name}
+                                className="block max-w-none object-contain"
+                                style={{
+                                    maxWidth: '100%',
+                                    maxHeight: '100%',
+                                    width: 'auto',
+                                    height: 'auto'
+                                }}
+                            />
+                        </div>
                     </div>
                 </div>
             )}
