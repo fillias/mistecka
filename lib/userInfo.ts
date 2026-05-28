@@ -1,6 +1,7 @@
 // lib/userInfo.ts
 import 'server-only';
 
+import { cache } from 'react';
 import { createClient } from '@/lib/supabase/server';
 
 export type UserInfo = {
@@ -9,7 +10,7 @@ export type UserInfo = {
     email: string | null;
 };
 
-export default async function userInfo(): Promise<UserInfo> {
+const getUserInfo = cache(async (): Promise<UserInfo> => {
     const supabase = await createClient();
 
     const {
@@ -31,4 +32,6 @@ export default async function userInfo(): Promise<UserInfo> {
         isEditor: roles.includes('editor'),
         email: user.email ?? null
     };
-}
+});
+
+export default getUserInfo;
