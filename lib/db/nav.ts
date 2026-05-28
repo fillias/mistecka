@@ -4,6 +4,9 @@ import { unstable_cache } from 'next/cache';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 async function fetchNavigationData() {
+    const fetchedAt = new Date().toISOString();
+    console.log('[nav] DB fetch at', fetchedAt);
+
     const supabase = createAdminClient();
 
     const [mainNavRes, countriesRes, areasRes] = await Promise.all([
@@ -19,7 +22,8 @@ async function fetchNavigationData() {
     return {
         mainNav: mainNavRes.data ?? [],
         countries: countriesRes.data ?? [],
-        areas: areasRes.data ?? []
+        areas: areasRes.data ?? [],
+        __debugFetchedAt: fetchedAt
     };
 }
 
@@ -42,7 +46,8 @@ export async function getAreasById(navId: string, countryId: string | null) {
 
 export async function getNavBySlug(slug: string) {
     const data = await getNavigationData();
-    return data.mainNav.find((item) => item.id === getLeadingNumber(slug)) ?? null;
+    const debugCache = `[nav] returned data fetched at ${data.__debugFetchedAt}`;
+    return { nav: data.mainNav.find((item) => item.id === getLeadingNumber(slug)) ?? null, debug: debugCache };
 }
 
 export async function getCountryBySlug(slug: string) {

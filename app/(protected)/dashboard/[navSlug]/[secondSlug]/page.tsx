@@ -16,7 +16,7 @@ type Props = {
 export default async function SecondLevelPage({ params }: Props) {
     const { isAdmin, isEditor } = await userInfo();
     const { navSlug, secondSlug } = await params;
-    const nav = await getNavBySlug(navSlug);
+    const { nav, debug } = await getNavBySlug(navSlug);
 
     if (!nav) notFound();
 
@@ -31,6 +31,7 @@ export default async function SecondLevelPage({ params }: Props) {
                 <Breadcrumb items={[{ label: nav.name, href: `/dashboard/${navSlug}` }, { label: country.name }]} />
 
                 <div className="card">
+                    {debug}
                     <div className="flex items-start justify-between gap-4">
                         <div>
                             <span className="eyebrow mb-3 block">{country.name}</span>

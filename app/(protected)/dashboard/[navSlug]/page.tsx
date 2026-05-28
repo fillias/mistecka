@@ -15,7 +15,7 @@ type Props = {
 export default async function NavPage({ params }: Props) {
     const { isAdmin, isEditor } = await userInfo();
     const { navSlug } = await params;
-    const nav = await getNavBySlug(navSlug);
+    const { nav, debug } = await getNavBySlug(navSlug);
 
     if (!nav) notFound();
 
@@ -23,6 +23,7 @@ export default async function NavPage({ params }: Props) {
 
     return (
         <div className="page-stack">
+            {debug}
             <div className="card">
                 <div className="flex items-start justify-between gap-4">
                     <div>

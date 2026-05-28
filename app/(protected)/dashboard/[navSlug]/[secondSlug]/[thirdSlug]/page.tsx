@@ -15,7 +15,7 @@ export default async function ThirdLevelPage({ params }: Props) {
     const { isAdmin, isEditor } = await userInfo();
     const { navSlug, secondSlug, thirdSlug } = await params;
 
-    const nav = await getNavBySlug(navSlug);
+    const { nav, debug } = await getNavBySlug(navSlug);
     if (!nav) notFound();
 
     const country = await getCountryBySlug(secondSlug);
@@ -39,6 +39,7 @@ export default async function ThirdLevelPage({ params }: Props) {
                     <div>
                         <span className="eyebrow mb-3 block">{country.name}</span>
                         <h1 className="mb-1">{area.name}</h1>
+                        {debug}
                     </div>
 
                     {(isAdmin || isEditor) && (
