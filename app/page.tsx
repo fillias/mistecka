@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import LoadingLink from '@/components/LoadingLink';
 
 export default async function Page() {
     return (
@@ -20,9 +19,9 @@ export default async function Page() {
                 <p className="mt-3 max-w-sm">Přihlaste se a pokračujte do přehledu svých oblíbených míst.</p>
 
                 <div className="mt-8 flex w-full justify-center">
-                    <LoadingLink href="/login" className="btn btn-primary btn-lg w-full sm:w-auto sm:min-w-48">
+                    <Link href="/login" className="btn btn-primary btn-lg w-full sm:w-auto sm:min-w-48">
                         Login
-                    </LoadingLink>
+                    </Link>
                 </div>
             </div>
         </section>

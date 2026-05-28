@@ -1,23 +1,26 @@
 import DashboardNav from '@/components/DashboardNav';
-import type { ReactNode } from 'react';
-import { getNavigationData } from '@/lib/db/nav';
+
 import 'flag-icons/css/flag-icons.min.css';
-// import { NavigationOverlayProvider } from '@/components/NavigationOverlayProvider';
+import { NavigationOverlayProvider } from '@/components/NavigationOverlayProvider';
 
 export default async function ProtectedLayout({ children }: { children: React.ReactNode }) {
-    const { mainNav } = await getNavigationData();
-
     return (
-        <>
+        <NavigationOverlayProvider>
             <header className="topbar -mx-4 mb-4 px-4 py-3 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
                 <div className="app-container px-0">
                     <div className="flex flex-col gap-3">
-                        <DashboardNav items={mainNav} />
+                        <DashboardNav />
                     </div>
                 </div>
             </header>
-
             <main className="page-stack">{children}</main>
-        </>
+        </NavigationOverlayProvider>
     );
 }
+
+/*
+
+
+
+
+    */

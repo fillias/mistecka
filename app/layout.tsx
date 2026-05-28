@@ -1,6 +1,5 @@
 import '../styles/globals.css';
-import { Footer } from '@/components/footer';
-import { NavigationOverlayProvider } from '@/components/NavigationOverlayProvider';
+import { Footer } from '@/components/Footer';
 
 export const metadata = {
     title: {
@@ -31,7 +30,7 @@ export default function RootLayout({ children }) {
             <body>
                 <div className="app-shell">
                     <div className="app-container flex min-h-dvh flex-col">
-                        <NavigationOverlayProvider>{children}</NavigationOverlayProvider>
+                        {children}
                         <Footer />
                     </div>
                 </div>

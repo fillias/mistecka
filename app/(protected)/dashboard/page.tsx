@@ -1,10 +1,10 @@
-import userInfo from '@/lib/userInfo';
 import Image from 'next/image';
+import { Suspense } from 'react';
+import LoggedUserEmail from './LoggedUserEmail';
 
 type pageProps = {};
 
 export default async function page({}: pageProps) {
-    const { email } = await userInfo();
     return (
         <>
             <section className="relative flex min-h-[70dvh] items-center justify-center overflow-hidden py-10 sm:min-h-[70dvh] sm:py-16">
@@ -25,7 +25,9 @@ export default async function page({}: pageProps) {
 
                 <div className="relative z-10 flex w-full max-w-md flex-col items-center justify-center text-center">
                     <h2 className="mb-2">Ahoj</h2>
-                    <span className="eyebrow">{email}</span>
+                    <Suspense>
+                        <LoggedUserEmail />
+                    </Suspense>
                 </div>
             </section>
         </>

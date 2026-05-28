@@ -1,84 +1,142 @@
 // lib/db/nav.ts
 import 'server-only';
-import { unstable_cache } from 'next/cache';
+import { cacheLife, cacheTag } from 'next/cache';
 import { createAdminClient } from '@/lib/supabase/admin';
 
-async function fetchNavigationData() {
+export async function getNavigationData() {
+    'use cache';
+
+    cacheTag('navigation-data');
+    cacheLife('hours');
+
     const fetchedAt = new Date().toISOString();
-    console.log('[nav] DB fetch at', fetchedAt);
+    console.log('[nav] DB fetch at:', fetchedAt);
 
     const supabase = createAdminClient();
 
-    const [mainNavRes, countriesRes, areasRes] = await Promise.all([
-        supabase.from('main_nav').select('id, name, slug, sort_order').order('sort_order', { ascending: true }),
-        supabase.from('country').select('id, name, code, slug, nav_id').order('name'),
-        supabase.from('area').select('id, name, slug, nav_id, country_id').order('name')
+    const [loupenickaRes, misteckaRes, countryMisteckaRes, areaMisteckaRes] = await Promise.all([
+        supabase.from('loupenicka').select('id, name, slug, sort_order').order('sort_order', { ascending: true }),
+        supabase.from('mistecka').select('id, name, slug, sort_order').order('sort_order', { ascending: true }),
+        supabase
+            .from('country_mistecka')
+            .select('id, mistecka_id, name, slug, code')
+            .order('name', { ascending: true }),
+        supabase
+            .from('area_mistecka')
+            .select('id, mistecka_id, country_mistecka_id, name, slug')
+            .order('name', { ascending: true })
     ]);
 
-    if (mainNavRes.error) throw mainNavRes.error;
-    if (countriesRes.error) throw countriesRes.error;
-    if (areasRes.error) throw areasRes.error;
+    if (loupenickaRes.error) throw loupenickaRes.error;
+    if (misteckaRes.error) throw misteckaRes.error;
+    if (countryMisteckaRes.error) throw countryMisteckaRes.error;
+    if (areaMisteckaRes.error) throw areaMisteckaRes.error;
 
     return {
-        mainNav: mainNavRes.data ?? [],
-        countries: countriesRes.data ?? [],
-        areas: areasRes.data ?? [],
+        loupenicka: loupenickaRes.data ?? [],
+        mistecka: misteckaRes.data ?? [],
+        countryMistecka: countryMisteckaRes.data ?? [],
+        areaMistecka: areaMisteckaRes.data ?? [],
         __debugFetchedAt: fetchedAt
     };
 }
 
-// hlavni navigaci zacachujem at se furt nedoptava db
-export const getNavigationData = unstable_cache(fetchNavigationData, ['navigation-data'], {
-    revalidate: 3600,
-    tags: ['navigation-data']
-});
+// ============================================================
+// ROOT NAV
+// ============================================================
 
-// Volitelné helpery nad jedním společným zdrojem
-
-export async function getAreasById(navId: string, countryId: string | null) {
+export async function getAllRootNav() {
     const data = await getNavigationData();
-    if (countryId) {
-        return data.areas.filter((item) => item.nav_id === navId && item.country_id === countryId);
-    } else {
-        return data.areas.filter((item) => item.nav_id === navId);
-    }
+
+    return [
+        ...data.loupenicka.map((item) => ({
+            ...item,
+            kind: 'loupenicka' as const
+        })),
+        ...data.mistecka.map((item) => ({
+            ...item,
+            kind: 'mistecka' as const
+        }))
+    ].sort((a, b) => a.sort_order - b.sort_order);
 }
 
-export async function getNavBySlug(slug: string) {
+export async function getLoupenicka() {
     const data = await getNavigationData();
-    const debugCache = `[nav] returned data fetched at ${data.__debugFetchedAt}`;
-    return { nav: data.mainNav.find((item) => item.id === getLeadingNumber(slug)) ?? null, debug: debugCache };
+    return data.loupenicka;
 }
 
-export async function getCountryBySlug(slug: string) {
+export async function getMistecka() {
     const data = await getNavigationData();
-    return data.countries.find((item) => item.id === getLeadingNumber(slug)) ?? null;
+    return data.mistecka;
 }
 
-export async function getAreaBySlug(slug: string) {
+export async function getLoupenickaBySlug(slug: string) {
     const data = await getNavigationData();
-    return data.areas.find((item) => item.id === getLeadingNumber(slug)) ?? null;
+    return data.loupenicka.find((item) => item.slug === slug) ?? null;
 }
 
-export async function getCountriesByNavId(navId: string) {
+export async function getMisteckaBySlug(slug: string) {
     const data = await getNavigationData();
-    return data.countries.filter((item) => item.nav_id === navId);
+    return data.mistecka.find((item) => item.slug === slug) ?? null;
 }
 
-export async function getPlacesById(navId: number, countryId: number | null, areaId: number) {
-    const supabase = await createAdminClient();
+// ============================================================
+// LOUPENICKA
+// ============================================================
 
-    let query = supabase.from('place').select('*').eq('nav_id', navId).eq('area_id', areaId);
+export async function getPlacesByLoupenickaId(loupenickaId: number | string) {
+    const supabase = createAdminClient();
 
-    query = countryId === null ? query.is('country_id', null) : query.eq('country_id', countryId);
-
-    const { data, error } = await query.order('created_at', { ascending: false });
+    const { data, error } = await supabase
+        .from('place_loupenicka')
+        .select('*')
+        .eq('loupenicka_id', loupenickaId)
+        .order('created_at', { ascending: false });
 
     if (error) throw error;
     return data ?? [];
 }
 
-function getLeadingNumber(str) {
-    const match = str.match(/^(\d+)-/);
-    return match ? parseInt(match[1], 10) : null;
+// ============================================================
+// MISTECKA
+// ============================================================
+
+export async function getCountriesByMisteckaId(misteckaId: number | string) {
+    const data = await getNavigationData();
+    return data.countryMistecka.filter((item) => String(item.mistecka_id) === String(misteckaId));
+}
+
+export async function getCountryMisteckaBySlug(misteckaId: number | string, slug: string) {
+    const data = await getNavigationData();
+    return (
+        data.countryMistecka.find((item) => String(item.mistecka_id) === String(misteckaId) && item.slug === slug) ??
+        null
+    );
+}
+
+export async function getAreasByCountryMisteckaId(countryMisteckaId: number | string) {
+    const data = await getNavigationData();
+    return data.areaMistecka.filter((item) => String(item.country_mistecka_id) === String(countryMisteckaId));
+}
+
+export async function getAreaMisteckaBySlug(countryMisteckaId: number | string, slug: string) {
+    const data = await getNavigationData();
+    return (
+        data.areaMistecka.find(
+            (item) => String(item.country_mistecka_id) === String(countryMisteckaId) && item.slug === slug
+        ) ?? null
+    );
+}
+
+export async function getPlacesByAreaMisteckaId(areaMisteckaId: number | string) {
+    const supabase = createAdminClient();
+
+    const { data, error } = await supabase
+        .from('place_mistecka')
+        .select('*')
+        .eq('area_mistecka_id', areaMisteckaId)
+        .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data ?? [];
 }

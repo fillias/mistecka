@@ -1,20 +1,19 @@
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import Breadcrumb from '@/components/Breadcrumb';
-import AddAreaModal from '@/components/AddAreaModal';
-import userInfo from '@/lib/userInfo';
+
 import { getNavBySlug, getCountryBySlug, getAreaBySlug } from '@/lib/db/nav';
 import Spinner from '@/app/UI/Spinner';
 import AreasList from './AreasList';
 import PlacesList from './PlacesList';
 import AddPlaceModal from '@/components/AddPlaceModal';
+import EditorNav from '@/components/EditorNav';
 
 type Props = {
     params: Promise<{ navSlug: string; secondSlug: string }>;
 };
 
 export default async function SecondLevelPage({ params }: Props) {
-    const { isAdmin, isEditor } = await userInfo();
     const { navSlug, secondSlug } = await params;
     const { nav, debug } = await getNavBySlug(navSlug);
 
@@ -38,14 +37,9 @@ export default async function SecondLevelPage({ params }: Props) {
                             <h2 className="mb-1">Vyber oblast</h2>
                         </div>
 
-                        {(isAdmin || isEditor) && (
-                            <AddAreaModal
-                                navId={nav.id}
-                                countryId={country.id}
-                                navSlug={navSlug}
-                                countrySlug={secondSlug}
-                            />
-                        )}
+                        <Suspense>
+                            <EditorNav nav={nav} navigation={{ navSlug, secondSlug }} country={country} />
+                        </Suspense>
                     </div>
                 </div>
 
@@ -69,6 +63,7 @@ export default async function SecondLevelPage({ params }: Props) {
                         <span className="eyebrow mb-3 block">{nav.name}</span>
                         <h1 className="mb-1">{area.name}</h1>
                     </div>
+
                     {(isAdmin || isEditor) && (
                         <AddPlaceModal navId={nav.id} areaId={area.id} navSlug={navSlug} areaSlug={secondSlug} />
                     )}

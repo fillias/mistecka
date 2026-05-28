@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { revalidatePath } from 'next/cache';
+import { revalidateTag } from 'next/cache';
 import userInfo from '@/lib/userInfo';
 import { createAdminClient } from '@/lib/supabase/admin';
 
@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: error.message }, { status: 400 });
         }
 
-        revalidatePath(`/dashboard/${navSlug}`);
+        revalidateTag('navigation-data', 'max');
 
         // !countrySlug && revalidatePath(`/dashboard/${navSlug}`);
 
