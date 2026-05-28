@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { getLoupenickaBySlug } from '@/lib/db/nav';
 import Breadcrumb from '@/components/Breadcrumb';
+import EditorNav from '@/components/EditorNav';
 
 import PlacesList from './PlacesList';
 
@@ -12,6 +13,7 @@ type Props = {
 
 export default async function DashboardLoupenickaDetailPage({ params }: Props) {
     const { navSlug } = await params;
+    console.log('navSlug: ', navSlug);
 
     const loupenicka = await getLoupenickaBySlug(navSlug);
 
@@ -32,6 +34,9 @@ export default async function DashboardLoupenickaDetailPage({ params }: Props) {
                         <h2 className="mb-1">{loupenicka.name}</h2>
                         <p>Seznam míst pro vybrané loupeníčko.</p>
                     </div>
+                    <Suspense>
+                        <EditorNav table="loupenicko" type="misto" data={{ slug: navSlug }} />
+                    </Suspense>
                 </div>
             </div>
 
