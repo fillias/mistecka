@@ -1,6 +1,46 @@
 // app/dashboard/loupenicka/[navSlug]/PlacesList.tsx
 import { getPlacesByLoupenickaId } from '@/lib/db/nav';
+import PlaceCardWithDetail from '@/components/PlaceCardWirhDetail';
+import userInfo from '@/lib/userInfo';
 
+type Props = {
+    loupenickaId: number;
+};
+
+export default async function PlacesList({ loupenickaId }: Props) {
+    const places = await getPlacesByLoupenickaId(loupenickaId);
+
+    const { isAdmin, isEditor } = await userInfo();
+
+    if (places.length === 0) {
+        return (
+            <div className="card flex flex-col items-center py-12 text-center">
+                <p className="mb-1 text-base font-medium" style={{ color: 'rgb(var(--text))' }}>
+                    Zatím žádná místa
+                </p>
+                <p>V této oblasti ještě nejsou přidána žádná místa.</p>
+            </div>
+        );
+    }
+
+    return (
+        <>
+            <p>
+                {places.length} {places.length === 1 ? 'místo' : 'míst'} v této oblasti
+            </p>
+
+            <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                {places.map((place) => (
+                    <li key={place.id}>
+                        <PlaceCardWithDetail kind="loupenicka" place={place} canManage={isAdmin || isEditor} />{' '}
+                    </li>
+                ))}
+            </ul>
+        </>
+    );
+}
+
+/*
 type Props = {
     loupenickaId: number;
 };
@@ -38,31 +78,52 @@ export default async function PlacesList({ loupenickaId }: Props) {
     );
 }
 
+
+
+*/
+
 /*
 
+import PlaceCardWithDetail from '@/components/PlaceCardWirhDetail';
+import { getPlacesById } from '@/lib/db/nav';
+import userInfo from '@/lib/userInfo';
+
 type Props = {
-    navId: string;
-    navSlug: string;
+    navId: number;
+    countryId: number;
+    areaId: number;
 };
 
-export default async function AreasList({ navId, navSlug }: Props) {
-    const areas = await getAreasById(navId, null);
+export default async function PlacesSection({ navId, countryId, areaId }: Props) {
+    const { isAdmin, isEditor } = await userInfo();
+
+    const places = await getPlacesById(navId, countryId, areaId);
+
+    if (places.length === 0) {
+        return (
+            <div className="card flex flex-col items-center py-12 text-center">
+                <p className="mb-1 text-base font-medium" style={{ color: 'rgb(var(--text))' }}>
+                    Zatím žádná místa
+                </p>
+                <p>V této oblasti ještě nejsou přidána žádná místa.</p>
+            </div>
+        );
+    }
 
     return (
-        <ul className="list-links">
-            {areas.map((area) => (
-                <li key={area.id}>
-                    <LoadingLink href={`/dashboard/${navSlug}/${area.id}-${area.slug}`} className="list-link">
-                        <div className="flex items-center justify-between gap-3">
-                            <h2 className="text-base font-semibold" style={{ color: 'rgb(var(--text))' }}>
-                                {area.name}
-                            </h2>
-                            <span className="meta-text shrink-0">→</span>
-                        </div>
-                    </LoadingLink>
-                </li>
-            ))}
-        </ul>
+        <>
+            <p>
+                {places.length} {places.length === 1 ? 'místo' : 'míst'} v této oblasti
+            </p>
+
+            <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                {places.map((place) => (
+                    <li key={place.id}>
+                        <PlaceCardWithDetail place={place} canManage={isAdmin || isEditor} />{' '}
+                    </li>
+                ))}
+            </ul>
+        </>
     );
 }
 

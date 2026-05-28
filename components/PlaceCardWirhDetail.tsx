@@ -8,11 +8,12 @@ import PlaceDetail from '@/components/PlaceDetail';
 import EditPlaceModal from '@/components/EditPlaceModal';
 
 type Props = {
+    kind: string;
     place: Tables<'place'>;
     canManage?: boolean;
 };
 
-export default function PlaceCardWithDetail({ place, canManage = false }: Props) {
+export default function PlaceCardWithDetail({ kind, place, canManage = false }: Props) {
     const router = useRouter();
 
     const [detailOpen, setDetailOpen] = useState(false);
@@ -52,7 +53,7 @@ export default function PlaceCardWithDetail({ place, canManage = false }: Props)
 
     return (
         <>
-            <PlaceCard place={place} onOpenDetail={() => setDetailOpen(true)} />
+            <PlaceCard kind={kind} place={place} onOpenDetail={() => setDetailOpen(true)} />
 
             {detailOpen && (
                 <PlaceDetail

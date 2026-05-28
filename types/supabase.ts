@@ -12,140 +12,256 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
-      area: {
+      area_mistecka: {
         Row: {
-          country_id: number | null
+          country_mistecka_id: number
+          created_at: string
           id: number
+          mistecka_id: number
           name: string
-          nav_id: number | null
           slug: string
-          sort_order: number | null
         }
         Insert: {
-          country_id?: number | null
+          country_mistecka_id: number
+          created_at?: string
           id?: number
+          mistecka_id: number
           name: string
-          nav_id?: number | null
           slug: string
-          sort_order?: number | null
         }
         Update: {
-          country_id?: number | null
+          country_mistecka_id?: number
+          created_at?: string
           id?: number
+          mistecka_id?: number
           name?: string
-          nav_id?: number | null
           slug?: string
-          sort_order?: number | null
         }
         Relationships: [
           {
-            foreignKeyName: "area_country_id_fkey"
-            columns: ["country_id"]
+            foreignKeyName: "area_mistecka_country_mistecka_id_fkey"
+            columns: ["country_mistecka_id"]
             isOneToOne: false
-            referencedRelation: "country"
+            referencedRelation: "country_mistecka"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "area_nav_id_fkey"
-            columns: ["nav_id"]
+            foreignKeyName: "area_mistecka_mistecka_id_fkey"
+            columns: ["mistecka_id"]
             isOneToOne: false
-            referencedRelation: "main_nav"
+            referencedRelation: "mistecka"
             referencedColumns: ["id"]
           },
         ]
       }
-      country: {
+      country_mistecka: {
         Row: {
-          code: string | null
+          code: string
+          created_at: string
           id: number
+          mistecka_id: number
           name: string
-          nav_id: number
           slug: string
-          sort_order: number | null
         }
         Insert: {
-          code?: string | null
+          code: string
+          created_at?: string
           id?: number
+          mistecka_id: number
           name: string
-          nav_id: number
           slug: string
-          sort_order?: number | null
         }
         Update: {
-          code?: string | null
+          code?: string
+          created_at?: string
           id?: number
+          mistecka_id?: number
           name?: string
-          nav_id?: number
           slug?: string
-          sort_order?: number | null
         }
         Relationships: [
           {
-            foreignKeyName: "country_nav_id_fkey"
-            columns: ["nav_id"]
+            foreignKeyName: "country_mistecka_mistecka_id_fkey"
+            columns: ["mistecka_id"]
             isOneToOne: false
-            referencedRelation: "main_nav"
+            referencedRelation: "mistecka"
             referencedColumns: ["id"]
           },
         ]
       }
-      main_nav: {
+      loupenicka: {
         Row: {
+          created_at: string
           id: number
           name: string
           slug: string
-          sort_order: number | null
+          sort_order: number
         }
         Insert: {
+          created_at?: string
           id?: number
           name: string
           slug: string
-          sort_order?: number | null
+          sort_order?: number
         }
         Update: {
+          created_at?: string
           id?: number
           name?: string
           slug?: string
-          sort_order?: number | null
+          sort_order?: number
         }
         Relationships: []
       }
-      place: {
+      mistecka: {
         Row: {
-          area_id: number
+          created_at: string
           id: number
-          place_description: string | null
-          place_gps_coords: string | null
-          place_image_url: string | null
-          place_name: string
-          place_type: string | null
+          name: string
+          slug: string
+          sort_order: number
         }
         Insert: {
-          area_id: number
+          created_at?: string
           id?: number
-          place_description?: string | null
-          place_gps_coords?: string | null
-          place_image_url?: string | null
-          place_name: string
-          place_type?: string | null
+          name: string
+          slug: string
+          sort_order?: number
         }
         Update: {
-          area_id?: number
+          created_at?: string
           id?: number
-          place_description?: string | null
-          place_gps_coords?: string | null
-          place_image_url?: string | null
-          place_name?: string
-          place_type?: string | null
+          name?: string
+          slug?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      place_loupenicka: {
+        Row: {
+          created_at: string
+          description: string | null
+          gps_coords: string | null
+          id: number
+          image_url: string | null
+          loupenicka_id: number
+          name: string
+          type: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          gps_coords?: string | null
+          id?: number
+          image_url?: string | null
+          loupenicka_id: number
+          name: string
+          type?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          gps_coords?: string | null
+          id?: number
+          image_url?: string | null
+          loupenicka_id?: number
+          name?: string
+          type?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "place_area_id_fkey"
-            columns: ["area_id"]
+            foreignKeyName: "place_loupenicka_loupenicka_id_fkey"
+            columns: ["loupenicka_id"]
             isOneToOne: false
-            referencedRelation: "area"
+            referencedRelation: "loupenicka"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      place_mistecka: {
+        Row: {
+          area_mistecka_id: number
+          country_mistecka_id: number
+          created_at: string
+          description: string | null
+          gps_coords: string | null
+          id: number
+          image_url: string | null
+          mistecka_id: number
+          name: string
+          type: string | null
+        }
+        Insert: {
+          area_mistecka_id: number
+          country_mistecka_id: number
+          created_at?: string
+          description?: string | null
+          gps_coords?: string | null
+          id?: number
+          image_url?: string | null
+          mistecka_id: number
+          name: string
+          type?: string | null
+        }
+        Update: {
+          area_mistecka_id?: number
+          country_mistecka_id?: number
+          created_at?: string
+          description?: string | null
+          gps_coords?: string | null
+          id?: number
+          image_url?: string | null
+          mistecka_id?: number
+          name?: string
+          type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "place_mistecka_area_mistecka_id_fkey"
+            columns: ["area_mistecka_id"]
+            isOneToOne: false
+            referencedRelation: "area_mistecka"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "place_mistecka_country_mistecka_id_fkey"
+            columns: ["country_mistecka_id"]
+            isOneToOne: false
+            referencedRelation: "country_mistecka"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "place_mistecka_mistecka_id_fkey"
+            columns: ["mistecka_id"]
+            isOneToOne: false
+            referencedRelation: "mistecka"
             referencedColumns: ["id"]
           },
         ]
@@ -284,6 +400,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {},
   },

@@ -2,9 +2,9 @@
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { getLoupenickaBySlug } from '@/lib/db/nav';
+import Breadcrumb from '@/components/Breadcrumb';
 
 import PlacesList from './PlacesList';
-import Spinner from '@/app/UI/Spinner';
 
 type Props = {
     params: Promise<{ navSlug: string }>;
@@ -19,13 +19,23 @@ export default async function DashboardLoupenickaDetailPage({ params }: Props) {
 
     return (
         <div className="page-stack">
+            <Breadcrumb
+                items={[
+                    { label: 'Loupeníčka', href: `/dashboard/loupenicka` },
+                    { label: loupenicka.name, href: `/dashboard/${navSlug}` }
+                ]}
+            />
+
             <div className="card">
-                <span className="eyebrow mb-3 block">Loupeníčko</span>
-                <h2 className="mb-1">{loupenicka.name}</h2>
-                <p>Seznam míst pro vybrané loupeníčko.</p>
+                <div className="flex items-start justify-between gap-4">
+                    <div>
+                        <h2 className="mb-1">{loupenicka.name}</h2>
+                        <p>Seznam míst pro vybrané loupeníčko.</p>
+                    </div>
+                </div>
             </div>
 
-            <Suspense fallback={<Spinner label="Načítám místa" />}>
+            <Suspense>
                 <PlacesList loupenickaId={loupenicka.id} />
             </Suspense>
         </div>

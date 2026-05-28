@@ -9,9 +9,12 @@ export default async function DashboardLoupenickaPage() {
     return (
         <div className="page-stack">
             <div className="card">
-                <span className="eyebrow mb-3 block">Dashboard</span>
-                <h2 className="mb-1">Loupeníčka</h2>
-                <p>Vyber loupeníčko pro zobrazení míst.</p>
+                <div className="flex items-start justify-between gap-4">
+                    <div>
+                        <h2 className="mb-1">Loupeníčka</h2>
+                        <p>Vyber loupeníčko pro zobrazení míst.</p>
+                    </div>
+                </div>
             </div>
 
             <div className="grid gap-4">

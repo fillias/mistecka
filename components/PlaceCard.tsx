@@ -3,12 +3,19 @@
 import type { Tables } from '@/types/supabase';
 import { createMapyCzLink } from '@/lib/utils';
 
-type PlaceCardProps = {
-    place: Tables<'place'>;
-    onOpenDetail: () => void;
-};
+type PlaceCardProps =
+    | {
+          kind: 'loupenicka';
+          place: Tables<'place_loupenicka'>;
+          onOpenDetail: () => void;
+      }
+    | {
+          kind: 'mistecka';
+          place: Tables<'place_mistecka'>;
+          onOpenDetail: () => void;
+      };
 
-export default function PlaceCard({ place, onOpenDetail }: PlaceCardProps) {
+export default function PlaceCard({ kind, place, onOpenDetail }: PlaceCardProps) {
     return (
         <article
             className="card flex h-full cursor-pointer flex-col gap-3"
@@ -21,32 +28,27 @@ export default function PlaceCard({ place, onOpenDetail }: PlaceCardProps) {
                     onOpenDetail();
                 }
             }}
-            aria-label={`Zobrazit detail místa ${place.place_name}`}
+            aria-label={`Zobrazit detail místa ${place.name}`}
         >
-            {place.place_image_url && (
+            {place.image_url && (
                 <div className="overflow-hidden rounded-xl" style={{ aspectRatio: '16/9' }}>
-                    <img
-                        src={place.place_image_url}
-                        alt={place.place_name}
-                        className="h-full w-full object-cover"
-                        loading="lazy"
-                    />
+                    <img src={place.image_url} alt={place.name} className="h-full w-full object-cover" loading="lazy" />
                 </div>
             )}
 
             <div className="flex items-start justify-between gap-2">
                 <h2 className="text-base font-semibold leading-snug" style={{ color: 'rgb(var(--text))' }}>
-                    {place.place_name}
+                    {place.name}
                 </h2>
-                {place.place_type && <span className="eyebrow shrink-0">{place.place_type}</span>}
+                {place.type && <span className="eyebrow shrink-0">{place.type}</span>}
             </div>
 
-            {place.place_description && <p className="line-clamp-3 text-sm leading-6">{place.place_description}</p>}
+            {place.description && <p className="line-clamp-3 text-sm leading-6">{place.description}</p>}
 
-            {place.place_gps_coords && (
+            {place.gps_coords && (
                 <div className="mt-auto pt-2" style={{ borderTop: '1px solid rgb(var(--border))' }}>
                     <a
-                        href={createMapyCzLink(place.place_gps_coords)}
+                        href={createMapyCzLink(place.gps_coords)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="btn btn-ghost !min-h-0 !px-0 !py-1 text-xs"
