@@ -1,6 +1,8 @@
 // app/dashboard/loupenicka/page.tsx
 import LoadingLink from '@/components/LoadingLink';
 import { getNavigationData } from '@/lib/db/nav';
+import { Suspense } from 'react';
+import EditorNav from '@/components/EditorNav';
 
 export default async function DashboardLoupenickaPage() {
     const data = await getNavigationData();
@@ -14,6 +16,9 @@ export default async function DashboardLoupenickaPage() {
                         <h2 className="mb-1">Loupeníčka</h2>
                         <p>Vyber loupeníčko pro zobrazení míst.</p>
                     </div>
+                    <Suspense>
+                        <EditorNav table="loupenicko" type="oblast" />
+                    </Suspense>
                 </div>
             </div>
 
