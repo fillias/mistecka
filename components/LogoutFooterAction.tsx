@@ -1,4 +1,5 @@
 import Link from 'next/link';
+
 import userInfo from '@/lib/userInfo';
 
 export async function LogoutFooterAction() {
@@ -7,7 +8,7 @@ export async function LogoutFooterAction() {
     if (!email) return null;
 
     return (
-        <div className="fixed bottom-2 right-4">
+        <div className="bottom-2 right-4">
             <Link href="/logout" className="btn btn-ghost text-sm" style={{ color: 'rgb(var(--text-soft))' }}>
                 Odhlásit →
             </Link>

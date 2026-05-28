@@ -17,7 +17,7 @@ export default async function EditorNav({ table, type, data }: EditorNavProps) {
     };
 
     if (table === 'loupenicko' && type === 'oblast') {
-        return <LoupenickoOblast />;
+        return <AddLoupenickoModal />;
     }
 
     return <></>;
