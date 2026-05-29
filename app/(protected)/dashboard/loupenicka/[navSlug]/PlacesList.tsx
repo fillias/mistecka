@@ -1,14 +1,15 @@
 // app/dashboard/loupenicka/[navSlug]/PlacesList.tsx
-import { getPlacesByLoupenickaId } from '@/lib/db/nav';
+import { getPlacesByLoupenickaId, getLoupenickaBySlug } from '@/lib/db/nav';
 import PlaceCardWithDetail from '@/components/PlaceCardWirhDetail';
 import userInfo from '@/lib/userInfo';
 
 type Props = {
-    loupenickaId: number;
+    navSlug: string;
 };
 
-export default async function PlacesList({ loupenickaId }: Props) {
-    const places = await getPlacesByLoupenickaId(loupenickaId);
+export default async function PlacesList({ navSlug }: Props) {
+    const loupenicka = await getLoupenickaBySlug(navSlug);
+    const places = await getPlacesByLoupenickaId(loupenicka.id);
 
     const { isAdmin, isEditor } = await userInfo();
 

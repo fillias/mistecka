@@ -28,7 +28,6 @@
         "npm:postcss@^8.4.36",
         "npm:react-dom@19.2.6",
         "npm:react@19.2.6",
-        "npm:slugify@^1.6.9",
         "npm:tailwindcss@^4.3.0",
         "npm:unique-names-generator@^4.7.1"
       ]

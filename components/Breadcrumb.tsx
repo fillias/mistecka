@@ -1,12 +1,25 @@
 import Link from 'next/link';
+import { getLoupenickaBySlug, getLoupenicka } from '@/lib/db/nav';
 
-export type BreadcrumbItem = {
-    label: string;
-    href?: string;
+export type Props = {
+    path?: string;
 };
 
-export default function Breadcrumb({ items }: { items: BreadcrumbItem[] }) {
-    if (items.length <= 1) return null;
+export default async function Breadcrumb({ path }: Props) {
+    if (!path) return null;
+
+    const sections = path.split('/');
+
+    const mainSection = sections[0];
+    const items = [];
+
+    const createLoupenickaBreadCrumb = async () => {
+        items.push({ label: 'Loupeníčka', href: '/dashboard/loupenicka' });
+        const oblast = await getLoupenickaBySlug(sections[1]);
+        items.push({ label: oblast.name, href: path });
+    };
+
+    mainSection === 'loupenicka' && (await createLoupenickaBreadCrumb());
 
     return (
         <nav aria-label="breadcrumb" className="mb-2">
