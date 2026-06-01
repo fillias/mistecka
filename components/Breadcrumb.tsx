@@ -12,6 +12,7 @@ export default async function Breadcrumb({ path, params }: Props) {
     const { navSlug } = await params;
 
     const sections = path.split('/');
+    console.log('sections: ', sections);
 
     const mainSection = sections[0];
 

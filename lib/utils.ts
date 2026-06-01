@@ -115,3 +115,8 @@ export function isValidGpsString(input: string) {
 export function removeIdFromSlugs(strings: string[]): string[] {
     return strings.map((str) => str.replace(/^\d+-/, ''));
 }
+
+export function getIdFromSlug(str: string): number {
+    const match = String(str).match(/^\d+/);
+    return match ? Number(match[0]) : null;
+}
