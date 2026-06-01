@@ -4,28 +4,37 @@ import { useEffect, useRef, useState } from 'react';
 import type { Tables } from '@/types/supabase';
 import { createMapyCzLink, createGoogleMapsLink } from '@/lib/utils';
 
-type Props = {
-    place: Tables<'place'>;
-    canManage?: boolean;
-    onClose: () => void;
-    onEdit?: (place: Tables<'place'>) => void;
-    onDelete?: (place: Tables<'place'>) => void;
-    deleteLoading?: boolean;
-    deleteError?: string | null;
-};
+type Props =
+    | {
+          kind: 'loupenicka';
+          place: Tables<'place_loupenicka'>;
+          canManage?: boolean;
+          onClose: () => void;
+          onEdit?: (place: Tables<'place_loupenicka'>) => void;
+          onDelete?: (place: Tables<'place_loupenicka'>) => void;
+          deleteLoading?: boolean;
+          deleteError?: string | null;
+      }
+    | {
+          kind: 'mistecka';
+          place: Tables<'place_mistecka'>;
+          canManage?: boolean;
+          onClose: () => void;
+          onEdit?: (place: Tables<'place_mistecka'>) => void;
+          onDelete?: (place: Tables<'place_mistecka'>) => void;
+          deleteLoading?: boolean;
+          deleteError?: string | null;
+      };
 
-export default function PlaceDetail({
-    place,
-    canManage = false,
-    onClose,
-    onEdit,
-    onDelete,
-    deleteLoading = false,
-    deleteError = null
-}: Props) {
+export default function PlaceDetail(props: Props) {
     const [imageOpen, setImageOpen] = useState(false);
     const [gpsCopied, setGpsCopied] = useState(false);
     const closeButtonRef = useRef<HTMLButtonElement | null>(null);
+
+    const place = props.place;
+    const canManage = props.canManage ?? false;
+    const deleteLoading = props.deleteLoading ?? false;
+    const deleteError = props.deleteError ?? null;
 
     useEffect(() => {
         const previousOverflow = document.body.style.overflow;
@@ -35,7 +44,7 @@ export default function PlaceDetail({
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === 'Escape') {
                 if (imageOpen) setImageOpen(false);
-                else onClose();
+                else props.onClose();
             }
         };
 
@@ -45,13 +54,13 @@ export default function PlaceDetail({
             document.body.style.overflow = previousOverflow;
             document.removeEventListener('keydown', handleKeyDown);
         };
-    }, [imageOpen, onClose]);
+    }, [imageOpen, props]);
 
     const handleCopyGps = async () => {
-        if (!place.place_gps_coords) return;
+        if (!place.gps_coords) return;
 
         try {
-            await navigator.clipboard.writeText(place.place_gps_coords);
+            await navigator.clipboard.writeText(place.gps_coords);
             setGpsCopied(true);
             window.setTimeout(() => setGpsCopied(false), 1500);
         } catch (error) {
@@ -59,9 +68,27 @@ export default function PlaceDetail({
         }
     };
 
+    const handleEdit = () => {
+        if (props.kind === 'loupenicka') {
+            props.onEdit?.(props.place);
+            return;
+        }
+
+        props.onEdit?.(props.place);
+    };
+
+    const handleDelete = () => {
+        if (props.kind === 'loupenicka') {
+            props.onDelete?.(props.place);
+            return;
+        }
+
+        props.onDelete?.(props.place);
+    };
+
     return (
         <>
-            <div className="fixed inset-0 z-40 bg-black/60" onClick={onClose} />
+            <div className="fixed inset-0 z-40 bg-black/60" onClick={props.onClose} />
 
             <div className="fixed inset-0 z-50 flex items-end sm:items-center sm:justify-center sm:p-6">
                 <div
@@ -74,7 +101,7 @@ export default function PlaceDetail({
                     <button
                         ref={closeButtonRef}
                         type="button"
-                        onClick={onClose}
+                        onClick={props.onClose}
                         className="absolute right-4 top-4 z-10 inline-flex h-12 w-12 items-center justify-center rounded-full border shadow-sm backdrop-blur transition hover:scale-[1.03]"
                         style={{
                             backgroundColor: 'rgb(var(--surface-2))',
@@ -101,16 +128,16 @@ export default function PlaceDetail({
 
                     <div className="flex-1 overflow-y-auto p-4 sm:p-6">
                         <div className="page-stack">
-                            {place.place_image_url && (
+                            {place.image_url && (
                                 <button
                                     type="button"
                                     onClick={() => setImageOpen(true)}
                                     className="block overflow-hidden rounded-2xl text-left"
-                                    aria-label={`Otevřít obrázek místa ${place.place_name} v plné kvalitě`}
+                                    aria-label={`Otevřít obrázek místa ${place.name} v plné kvalitě`}
                                 >
                                     <img
-                                        src={place.place_image_url}
-                                        alt={place.place_name}
+                                        src={place.image_url}
+                                        alt={place.name}
                                         className="h-auto max-h-[48vh] w-full object-cover"
                                     />
                                 </button>
@@ -123,21 +150,21 @@ export default function PlaceDetail({
                                         className="text-xl font-semibold"
                                         style={{ color: 'rgb(var(--text))' }}
                                     >
-                                        {place.place_name}
+                                        {place.name}
                                     </h2>
 
-                                    {place.place_type && <span className="eyebrow shrink-0">{place.place_type}</span>}
+                                    {place.type && <span className="eyebrow shrink-0">{place.type}</span>}
                                 </div>
 
-                                {place.place_description ? (
-                                    <p className="leading-7">{place.place_description}</p>
+                                {place.description ? (
+                                    <p className="leading-7">{place.description}</p>
                                 ) : (
                                     <p style={{ color: 'rgb(var(--text-muted))' }}>Místo zatím nemá popis.</p>
                                 )}
                             </div>
 
                             <div className="flex flex-row items-center gap-3">
-                                {place.place_gps_coords && (
+                                {place.gps_coords && (
                                     <>
                                         <div
                                             className="flex flex-row items-center gap-3"
@@ -145,7 +172,7 @@ export default function PlaceDetail({
                                             aria-label="Map links"
                                         >
                                             <a
-                                                href={createMapyCzLink(place.place_gps_coords)}
+                                                href={createMapyCzLink(place.gps_coords)}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="inline-flex h-11 w-11 items-center justify-center transition hover:scale-[1.03]"
@@ -161,7 +188,7 @@ export default function PlaceDetail({
                                             </a>
 
                                             <a
-                                                href={createGoogleMapsLink(place.place_gps_coords)}
+                                                href={createGoogleMapsLink(place.gps_coords)}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="inline-flex h-11 w-11 items-center justify-center transition hover:scale-[1.03]"
@@ -197,14 +224,14 @@ export default function PlaceDetail({
 
                             {canManage && (
                                 <div
-                                    className="flex  gap-2 border-t pt-4"
+                                    className="flex gap-2 border-t pt-4"
                                     style={{ borderColor: 'rgb(var(--border))' }}
                                     role="group"
                                     aria-label="Akce pro správu místa"
                                 >
                                     <button
                                         type="button"
-                                        onClick={() => onEdit?.(place)}
+                                        onClick={handleEdit}
                                         className="inline-flex h-11 w-18 items-center justify-center rounded-full border transition hover:bg-black/5"
                                         style={{ borderColor: 'rgb(var(--border))', color: 'rgb(var(--text))' }}
                                         aria-label="Upravit místo"
@@ -228,7 +255,7 @@ export default function PlaceDetail({
 
                                     <button
                                         type="button"
-                                        onClick={() => onDelete?.(place)}
+                                        onClick={handleDelete}
                                         className="ml-auto inline-flex h-11 w-11 items-center justify-center rounded-full border transition hover:bg-red-500/10 disabled:opacity-50"
                                         style={{
                                             borderColor: 'rgb(var(--danger) / 0.35)',
@@ -277,7 +304,7 @@ export default function PlaceDetail({
                 </div>
             </div>
 
-            {imageOpen && place.place_image_url && (
+            {imageOpen && place.image_url && (
                 <div className="fixed inset-0 z-[60] bg-black">
                     <button
                         type="button"
@@ -315,8 +342,8 @@ export default function PlaceDetail({
                     >
                         <div className="flex min-h-full min-w-full items-center justify-center">
                             <img
-                                src={place.place_image_url}
-                                alt={place.place_name}
+                                src={place.image_url}
+                                alt={place.name}
                                 className="block max-w-none object-contain"
                                 style={{
                                     maxWidth: '100%',

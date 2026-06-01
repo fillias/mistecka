@@ -4,7 +4,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import type { Tables } from '@/types/supabase';
-import LoadingLink from '@/components/LoadingLink';
 import { getAllRootNav } from '@/lib/db/nav';
 
 export default function DashboardNav() {
@@ -14,7 +13,7 @@ export default function DashboardNav() {
 
     return (
         <nav aria-label="Hlavní navigace" className="nav-scroll items-center">
-            <LoadingLink
+            <Link
                 href="/dashboard"
                 className="mr-3 flex h-14 w-14 shrink-0 items-center justify-center sm:mr-4 sm:h-16 sm:w-16"
                 aria-label="Přejít na dashboard"
@@ -27,15 +26,15 @@ export default function DashboardNav() {
                     alt="Místečka logo"
                     className="logo-img h-10 w-10 sm:h-12 sm:w-12"
                 />
-            </LoadingLink>
+            </Link>
 
-            <LoadingLink
+            <Link
                 href="/dashboard/loupenicka"
                 aria-current={isActive ? 'page' : undefined}
                 className={`nav-pill ${isActive ? 'nav-pill-active' : ''}`}
             >
                 Loupeníčka
-            </LoadingLink>
+            </Link>
         </nav>
     );
 }
@@ -46,7 +45,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import type { Tables } from '@/types/supabase';
-import LoadingLink from '@/components/LoadingLink';
+import Link from '@/components/Link';
 
 type DashboardNavProps = {
     items: Tables<'main_nav'>[];
@@ -77,14 +76,14 @@ export default function DashboardNav({ items }: DashboardNavProps) {
                 const isActive = pathname.startsWith(href);
 
                 return (
-                    <LoadingLink
+                    <Link
                         key={item.id}
                         href={href}
                         aria-current={isActive ? 'page' : undefined}
                         className={`nav-pill ${isActive ? 'nav-pill-active' : ''}`}
                     >
                         {item.name}
-                    </LoadingLink>
+                    </Link>
                 );
             })}
         </nav>

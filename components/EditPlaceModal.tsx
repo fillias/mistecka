@@ -4,22 +4,31 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Tables } from '@/types/supabase';
 
-type Props = {
-    place: Tables<'place'>;
-    open: boolean;
-    onOpenChange: (open: boolean) => void;
-    onSaved?: (place: Tables<'place'>) => void;
-};
+type Props =
+    | {
+          kind: 'loupenicka';
+          open: boolean;
+          place: Tables<'place_loupenicka'>;
+          onOpenChange: (open: boolean) => void;
+          onSaved?: (place: Tables<'place_loupenicka'>) => void;
+      }
+    | {
+          kind: 'mistecka';
+          open: boolean;
+          place: Tables<'place_mistecka'>;
+          onOpenChange: (open: boolean) => void;
+          onSaved?: (place: Tables<'place_mistecka'>) => void;
+      };
 
 export default function EditPlaceModal({ place, open, onOpenChange, onSaved }: Props) {
     const router = useRouter();
     const firstInputRef = useRef<HTMLInputElement | null>(null);
 
-    const [name, setName] = useState(place.place_name ?? '');
-    const [type, setType] = useState(place.place_type ?? '');
-    const [description, setDescription] = useState(place.place_description ?? '');
-    const [imageUrl, setImageUrl] = useState(place.place_image_url ?? '');
-    const [gpsCoords, setGpsCoords] = useState(place.place_gps_coords ?? '');
+    const [name, setName] = useState(place.name ?? '');
+    const [type, setType] = useState(place.type ?? '');
+    const [description, setDescription] = useState(place.description ?? '');
+    const [imageUrl, setImageUrl] = useState(place.image_url ?? '');
+    const [gpsCoords, setGpsCoords] = useState(place.gps_coords ?? '');
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -27,11 +36,11 @@ export default function EditPlaceModal({ place, open, onOpenChange, onSaved }: P
     useEffect(() => {
         if (!open) return;
 
-        setName(place.place_name ?? '');
-        setType(place.place_type ?? '');
-        setDescription(place.place_description ?? '');
-        setImageUrl(place.place_image_url ?? '');
-        setGpsCoords(place.place_gps_coords ?? '');
+        setName(place.name ?? '');
+        setType(place.type ?? '');
+        setDescription(place.description ?? '');
+        setImageUrl(place.image_url ?? '');
+        setGpsCoords(place.gps_coords ?? '');
         setError(null);
 
         const previousOverflow = document.body.style.overflow;
@@ -72,11 +81,11 @@ export default function EditPlaceModal({ place, open, onOpenChange, onSaved }: P
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    place_name: name.trim(),
-                    place_type: type.trim() || null,
-                    place_description: description.trim() || null,
-                    place_image_url: imageUrl.trim() || null,
-                    place_gps_coords: gpsCoords.trim() || null
+                    name: name.trim(),
+                    type: type.trim() || null,
+                    description: description.trim() || null,
+                    image_url: imageUrl.trim() || null,
+                    gps_coords: gpsCoords.trim() || null
                 })
             });
 

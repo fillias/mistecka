@@ -4,11 +4,13 @@ import PlaceCardWithDetail from '@/components/PlaceCardWirhDetail';
 import userInfo from '@/lib/userInfo';
 
 type Props = {
-    navSlug: string;
+    params: Promise<{ navSlug: string }>;
 };
 
-export default async function PlacesList({ navSlug }: Props) {
+export default async function PlacesList({ params }: Props) {
+    const { navSlug } = await params;
     const loupenicka = await getLoupenickaBySlug(navSlug);
+
     const places = await getPlacesByLoupenickaId(loupenicka.id);
 
     const { isAdmin, isEditor } = await userInfo();
@@ -33,7 +35,7 @@ export default async function PlacesList({ navSlug }: Props) {
             <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {places.map((place) => (
                     <li key={place.id}>
-                        <PlaceCardWithDetail kind="loupenicka" place={place} canManage={isAdmin || isEditor} />{' '}
+                        <PlaceCardWithDetail kind="loupenicka" place={place} canManage={isAdmin || isEditor} />
                     </li>
                 ))}
             </ul>

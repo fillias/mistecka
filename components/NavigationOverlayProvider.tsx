@@ -1,6 +1,16 @@
 'use client';
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import {
+    Suspense,
+    createContext,
+    useCallback,
+    useContext,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+    type ReactNode
+} from 'react';
 import { usePathname } from 'next/navigation';
 import Spinner from '@/app/UI/Spinner';
 
@@ -11,13 +21,17 @@ type NavigationOverlayContextValue = {
 
 const NavigationOverlayContext = createContext<NavigationOverlayContextValue | null>(null);
 
-export function NavigationOverlayProvider({ children }: { children: ReactNode }) {
+function PathnameWatcher({ onRouteChange }: { onRouteChange: () => void }) {
     const pathname = usePathname();
 
-    // reseni kvuli buildu abych nemusel cely Provider obalit suspense
-    // pokud budou potreba searchParams, vyresit jinak
-    const searchParams = null; // useSearchParams();
+    useEffect(() => {
+        onRouteChange();
+    }, [pathname, onRouteChange]);
 
+    return null;
+}
+
+export function NavigationOverlayProvider({ children }: { children: ReactNode }) {
     const [visible, setVisible] = useState(false);
     const timerRef = useRef<number | null>(null);
 
@@ -40,10 +54,6 @@ export function NavigationOverlayProvider({ children }: { children: ReactNode })
     }, []);
 
     useEffect(() => {
-        hide();
-    }, [pathname, searchParams, hide]);
-
-    useEffect(() => {
         return () => {
             if (timerRef.current) window.clearTimeout(timerRef.current);
         };
@@ -53,6 +63,10 @@ export function NavigationOverlayProvider({ children }: { children: ReactNode })
 
     return (
         <NavigationOverlayContext.Provider value={value}>
+            <Suspense fallback={null}>
+                <PathnameWatcher onRouteChange={hide} />
+            </Suspense>
+
             {children}
 
             {visible && (

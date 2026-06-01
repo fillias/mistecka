@@ -3,19 +3,23 @@ import { getLoupenickaBySlug, getLoupenicka } from '@/lib/db/nav';
 
 export type Props = {
     path?: string;
+    params: Promise<{ navSlug: string }>;
 };
 
-export default async function Breadcrumb({ path }: Props) {
+export default async function Breadcrumb({ path, params }: Props) {
     if (!path) return null;
+
+    const { navSlug } = await params;
 
     const sections = path.split('/');
 
     const mainSection = sections[0];
+
     const items = [];
 
     const createLoupenickaBreadCrumb = async () => {
         items.push({ label: 'Loupeníčka', href: '/dashboard/loupenicka' });
-        const oblast = await getLoupenickaBySlug(sections[1]);
+        const oblast = await getLoupenickaBySlug(navSlug);
         items.push({ label: oblast.name, href: path });
     };
 
