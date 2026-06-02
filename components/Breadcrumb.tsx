@@ -1,29 +1,49 @@
 import Link from 'next/link';
-import { getLoupenickaBySlug, getLoupenicka } from '@/lib/db/nav';
+import {
+    getLoupenickaBySlug,
+    getMisteckaBySlug,
+    getCountryMisteckaBySlug,
+    getCountriesByMisteckaId
+} from '@/lib/db/nav';
+import { removeIdFromSlugs, getIdFromSlug } from '@/lib/utils';
 
 export type Props = {
-    path?: string;
+    mainSection: string;
     params?: Promise<{ navSlug: string }>;
 };
 
-export async function Breadcrumb({ path, params }: Props) {
-    if (!path) return null;
+export async function Breadcrumb({ mainSection, params }: Props) {
+    if (!mainSection) return null;
 
     const { navSlug } = await params;
-
-    const sections = path.split('/');
-
-    const mainSection = sections[0];
+    console.log('navSlug: ', navSlug);
 
     const items = [];
 
     const createLoupenickaBreadCrumb = async () => {
         items.push({ label: 'Loupeníčka', href: '/dashboard/loupenicka' });
         const oblast = await getLoupenickaBySlug(navSlug);
-        oblast && items.push({ label: oblast.name, href: path });
+        oblast && items.push({ label: oblast.name, href: oblast.slug });
+    };
+
+    const createMisteckaBreadCrumb = async () => {
+        const navId = getIdFromSlug(navSlug);
+        const [slug] = removeIdFromSlugs([navSlug]);
+
+        const oblast = await getMisteckaBySlug(slug);
+        console.log('oblast: ', oblast);
+        const x = await getCountryMisteckaBySlug(navId, slug);
+        console.log('x: ', x);
+
+        const countryList = await getCountriesByMisteckaId(navId);
+
+        items.push({ label: oblast.name, href: `/dashboard/${navSlug}` });
+
+        // oblast && items.push({ label: oblast.name, href: oblast.slug });
     };
 
     mainSection === 'loupenicka' && (await createLoupenickaBreadCrumb());
+    mainSection === 'mistecka' && (await createMisteckaBreadCrumb());
 
     return (
         <nav aria-label="breadcrumb" className="h-5">

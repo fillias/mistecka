@@ -17,7 +17,7 @@ export default async function DashboardLoupenickaDetailPage({ params }: Props) {
     return (
         <div className="page-stack">
             <Suspense fallback={<BreadcrumbPlaceholder />}>
-                <Breadcrumb path={`loupenicka`} params={params} />
+                <Breadcrumb mainSection={`loupenicka`} params={params} />
             </Suspense>
 
             <div className="card">

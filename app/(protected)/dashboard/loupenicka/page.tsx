@@ -14,7 +14,7 @@ export default async function DashboardLoupenickaPage({ params }: Props) {
     return (
         <div className="page-stack">
             <Suspense fallback={<BreadcrumbPlaceholder />}>
-                <Breadcrumb path={`loupenicka`} params={params} />
+                <Breadcrumb mainSection={`loupenicka`} params={params} />
             </Suspense>
             <div className="card">
                 <div className="flex items-start justify-between gap-4">

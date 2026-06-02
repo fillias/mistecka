@@ -33,12 +33,12 @@ export async function POST(req: NextRequest) {
         const supabase = createAdminClient();
 
         const { data, error } = await supabase
-            .from('country')
+            .from('country_mistecka')
             .insert({
                 name,
                 slug,
                 code,
-                nav_id: navId
+                mistecka_id: navId
             })
             .select()
             .single();
