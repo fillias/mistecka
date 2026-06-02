@@ -4,10 +4,14 @@ type HeaderSectionNameProps = {
     params: Promise<{ navSlug: string }>;
 };
 
-export default async function HeaderSectionName({ params }: HeaderSectionNameProps) {
+export async function HeaderSectionName({ params }: HeaderSectionNameProps) {
     const { navSlug } = await params;
 
     const { name } = await getLoupenickaBySlug(navSlug);
 
-    return <h2 className="mb-1">{name}</h2>;
+    return <h2 className="mb-1 h-9">{name}</h2>;
+}
+
+export function HeaderSectionNamePlaceholder() {
+    return <h2 className="mb-1 h-9"></h2>;
 }

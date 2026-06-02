@@ -27,7 +27,7 @@ export default async function page({}: pageProps) {
                 <div className="relative z-10 flex w-full max-w-md flex-col items-center justify-center text-center">
                     <h2 className="mb-2">Ahoj</h2>
                     <Suspense fallback={<span className="eyebrow opacity-50">načítám…</span>}>
-                        <FadeIn delay={0.15}>
+                        <FadeIn delay={0.15} moveY={8}>
                             <LoggedUserEmail />
                         </FadeIn>
                     </Suspense>

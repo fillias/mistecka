@@ -20,7 +20,7 @@ export default async function DashboardLoupenickaPage({ params }: Props) {
                 <div className="flex items-start justify-between gap-4">
                     <div>
                         <h2 className="mb-1">Loupeníčka</h2>
-                        <p>Vyber loupeníčko pro zobrazení míst.</p>
+                        <p>Vyber místo</p>
                     </div>
                     <Suspense>
                         <FadeIn>

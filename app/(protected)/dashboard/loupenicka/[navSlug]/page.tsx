@@ -3,11 +3,11 @@ import { Suspense } from 'react';
 
 import { Breadcrumb, BreadcrumbPlaceholder } from '@/components/Breadcrumb';
 import EditorNav from '@/components/EditorNav';
-import HeaderSectionName from './HeaderSectionName';
+import { HeaderSectionName, HeaderSectionNamePlaceholder } from './HeaderSectionName';
 import Spinner from '@/app/UI/Spinner';
 
 import PlacesList from './PlacesList';
-import { SP } from 'next/dist/shared/lib/utils';
+import FadeIn from '@/app/UI/FadeIn';
 
 type Props = {
     params: Promise<{ navSlug: string }>;
@@ -23,13 +23,17 @@ export default async function DashboardLoupenickaDetailPage({ params }: Props) {
             <div className="card">
                 <div className="flex items-start justify-between gap-4">
                     <div>
-                        <Suspense>
-                            <HeaderSectionName params={params} />
+                        <Suspense fallback={<HeaderSectionNamePlaceholder />}>
+                            <FadeIn>
+                                <HeaderSectionName params={params} />
+                            </FadeIn>
                         </Suspense>
-                        <p>Seznam míst pro vybrané loupeníčko.</p>
+                        <p>Seznam loupeníček</p>
                     </div>
                     <Suspense fallback={null}>
-                        <EditorNav table="loupenicko" type="misto" params={params} />
+                        <FadeIn>
+                            <EditorNav table="loupenicko" type="misto" params={params} />
+                        </FadeIn>
                     </Suspense>
                 </div>
             </div>

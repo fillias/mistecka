@@ -26,7 +26,7 @@ export async function Breadcrumb({ path, params }: Props) {
     mainSection === 'loupenicka' && (await createLoupenickaBreadCrumb());
 
     return (
-        <nav aria-label="breadcrumb" className="mb-2">
+        <nav aria-label="breadcrumb" className="h-5">
             <ol className="flex flex-wrap items-center gap-2 text-sm text-slate-500">
                 {items.map((item, index) => {
                     const isLast = index === items.length - 1;
@@ -49,9 +49,5 @@ export async function Breadcrumb({ path, params }: Props) {
 }
 
 export function BreadcrumbPlaceholder() {
-    return (
-        <nav aria-hidden="true" className="mb-2">
-            <div className="h-[20px]" />
-        </nav>
-    );
+    return <nav aria-hidden="true" className="h-5"></nav>;
 }
