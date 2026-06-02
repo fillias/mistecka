@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { Suspense } from 'react';
 import LoggedUserEmail from './LoggedUserEmail';
+import FadeIn from '@/app/UI/FadeIn';
 
 type pageProps = {};
 
@@ -25,8 +26,10 @@ export default async function page({}: pageProps) {
 
                 <div className="relative z-10 flex w-full max-w-md flex-col items-center justify-center text-center">
                     <h2 className="mb-2">Ahoj</h2>
-                    <Suspense>
-                        <LoggedUserEmail />
+                    <Suspense fallback={<span className="eyebrow opacity-50">načítám…</span>}>
+                        <FadeIn delay={0.15}>
+                            <LoggedUserEmail />
+                        </FadeIn>
                     </Suspense>
                 </div>
             </section>
