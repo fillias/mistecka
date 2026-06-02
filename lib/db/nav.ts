@@ -62,7 +62,6 @@ export async function getAllRootNav() {
 }
 
 export async function getLoupenicka() {
-    await sleep(2000);
     const data = await getNavigationData();
     return data.loupenicka;
 }
@@ -73,7 +72,6 @@ export async function getMistecka() {
 }
 
 export async function getLoupenickaBySlug(slug: string) {
-    await sleep(2000);
     const data = await getNavigationData();
     return data.loupenicka.find((item) => item.slug === slug) ?? null;
 }
@@ -88,7 +86,6 @@ export async function getMisteckaBySlug(slug: string) {
 // ============================================================
 
 export async function getPlacesByLoupenickaId(loupenickaId: number | string) {
-    await sleep(2000);
     const supabase = createAdminClient();
 
     const { data, error } = await supabase
