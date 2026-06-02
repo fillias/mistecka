@@ -36,7 +36,7 @@ export default async function SecondLevelPage({ params }: Props) {
             </div>
 
             <Suspense fallback={<Spinner />}>
-                {/* <AreasList navId={nav.id} countryId={country.id} navSlug={navSlug} secondSlug={secondSlug} /> */}
+                <AreasList params={params} />
             </Suspense>
         </div>
     );

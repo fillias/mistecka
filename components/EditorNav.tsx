@@ -19,7 +19,7 @@ type EditorNavProps = {
 };
 
 export default async function EditorNav({ table, type, params }: EditorNavProps) {
-    const navSlug = params ? (await params).navSlug : undefined;
+    const { navSlug, secondSlug, thirdSlug } = params ? await params : undefined;
 
     const { isAdmin, isEditor } = await userInfo();
 
@@ -38,12 +38,17 @@ export default async function EditorNav({ table, type, params }: EditorNavProps)
 
     if (table === 'mistecko' && type === 'zeme') {
         const navId = getIdFromSlug(navSlug);
-
-        // const countries = await getCountriesByMisteckaId(navId);
-        // const [slug] = removeIdFromSlugs([navSlug]);
-
         return <AddCountryModal navId={navId} navSlug={navSlug} />;
+    }
+
+    if (table === 'mistecko' && type === 'oblast') {
+        const navId = getIdFromSlug(navSlug);
+        const countryId = getIdFromSlug(secondSlug);
+        return <AddAreaModal misteckaId={navId} navSlug={navSlug} countryId={countryId} countrySlug={secondSlug} />;
     }
 
     return <></>;
 }
+
+// const countries = await getCountriesByMisteckaId(navId);
+// const [slug] = removeIdFromSlugs([navSlug]);

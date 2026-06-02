@@ -7,7 +7,7 @@ export default function Spinner({ label = 'Načítám seznam' }: Props) {
         <div
             className="flex min-w-[180px] items-center justify-center rounded-2xl  px-6 py-5 shadow-xl"
             style={{
-                backgroundColor: 'rgb(var(--surface) / 0.92)',
+                backgroundColor: 'rgb(var(--surface) / 3)',
                 borderColor: 'rgb(var(--border))',
                 color: 'rgb(var(--text))',
                 bottom: '0.5rem',

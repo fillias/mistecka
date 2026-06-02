@@ -10,8 +10,8 @@ export async function getNavigationData() {
     cacheTag('navigation-data');
     cacheLife('hours');
 
-    const fetchedAt = new Date().toISOString();
-    console.log('[nav] DB fetch at:', fetchedAt);
+    // const fetchedAt = new Date().toISOString();
+    // console.log('[nav] DB fetch at:', fetchedAt);
 
     const supabase = createAdminClient();
 
@@ -37,8 +37,8 @@ export async function getNavigationData() {
         loupenicka: loupenickaRes.data ?? [],
         mistecka: misteckaRes.data ?? [],
         countryMistecka: countryMisteckaRes.data ?? [],
-        areaMistecka: areaMisteckaRes.data ?? [],
-        __debugFetchedAt: fetchedAt
+        areaMistecka: areaMisteckaRes.data ?? []
+        // __debugFetchedAt: fetchedAt
     };
 }
 

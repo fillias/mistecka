@@ -14,26 +14,24 @@ export async function POST(req: NextRequest) {
         }
 
         const body = await req.json();
-        const navSlug = String(body.navSlug);
-        const countrySlug = String(body.countrySlug);
         const name = String(body.name ?? '').trim();
-        const navId = Number(body.nav_id);
+        const misteckaId = Number(body.mistecka_id);
         const countryId = Number(body.country_id) || null;
         const slug = slugify(name);
 
-        if (!name || !navId) {
+        if (!name || !misteckaId) {
             return NextResponse.json({ error: 'Chybí povinná data.' }, { status: 400 });
         }
 
         const supabase = createAdminClient();
 
         const { data, error } = await supabase
-            .from('area')
+            .from('area_mistecka')
             .insert({
                 name,
                 slug,
-                country_id: countryId,
-                nav_id: navId
+                country_mistecka_id: countryId,
+                mistecka_id: misteckaId
             })
             .select()
             .single();

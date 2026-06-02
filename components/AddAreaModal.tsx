@@ -6,13 +6,13 @@ import type { SubmitEventHandler } from 'react';
 import { removeIdFromSlugs } from '@/lib/utils';
 
 type Props = {
-    navId: number;
+    misteckaId: number;
     countryId?: number; // number | undefined
     navSlug: string;
     countrySlug?: string; // string | undefined
 };
 
-export default function AddAreaModal({ navId, countryId, navSlug, countrySlug }: Props) {
+export default function AddAreaModal({ misteckaId, countryId, navSlug, countrySlug }: Props) {
     const router = useRouter();
     const [open, setOpen] = useState(false);
     const [name, setName] = useState('');
@@ -32,7 +32,7 @@ export default function AddAreaModal({ navId, countryId, navSlug, countrySlug }:
                 },
                 body: JSON.stringify({
                     name: name.trim(),
-                    nav_id: navId,
+                    mistecka_id: misteckaId,
                     country_id: countryId,
                     navSlug: navSlug,
                     countrySlug: countrySlug

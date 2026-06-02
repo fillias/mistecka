@@ -32,7 +32,7 @@ export async function Breadcrumb({ mainSection, params }: Props) {
         const mainNav = await getMisteckaBySlug(mainNavSlug);
         const countryNav = await getCountryMisteckaBySlug(navId, countryNavSlug);
 
-        console.log('countryNavSlug: ', countryNavSlug);
+        // console.log('countryNavSlug: ', countryNavSlug);
         // const countryList = await getCountriesByMisteckaId(navId);
         // console.log('countryList: ', countryList);
 
