@@ -1,9 +1,10 @@
 import { Suspense } from 'react';
 import { Breadcrumb, BreadcrumbPlaceholder } from '@/components/Breadcrumb';
-
+import SectionLabel from './SectionLabel';
 import Spinner from '@/app/UI/Spinner';
 import AreasList from './AreasList';
 import EditorNav from '@/components/EditorNav';
+import FadeIn from '@/app/UI/FadeIn';
 
 type Props = {
     params: Promise<{ navSlug: string; secondSlug: string }>;
@@ -18,13 +19,19 @@ export default async function SecondLevelPage({ params }: Props) {
             <div className="card">
                 <div className="flex items-start justify-between gap-4">
                     <div>
-                        <span className="eyebrow mb-3 block">TODO</span>
+                        <Suspense fallback={null}>
+                            <FadeIn>
+                                <SectionLabel params={params} />
+                            </FadeIn>
+                        </Suspense>
                         <h2 className="mb-1">Vyber oblast</h2>
                     </div>
 
-                    {/* <Suspense>
-                        <EditorNav nav={nav} navigation={{ navSlug, secondSlug }} country={country} />
-                    </Suspense> */}
+                    <Suspense fallback={null}>
+                        <FadeIn>
+                            <EditorNav table="mistecko" type="oblast" params={params} />
+                        </FadeIn>
+                    </Suspense>
                 </div>
             </div>
 

@@ -11,7 +11,7 @@ export async function getNavigationData() {
     cacheLife('hours');
 
     const fetchedAt = new Date().toISOString();
-    // console.log('[nav] DB fetch at:', fetchedAt);
+    console.log('[nav] DB fetch at:', fetchedAt);
 
     const supabase = createAdminClient();
 

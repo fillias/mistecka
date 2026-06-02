@@ -21,7 +21,7 @@ export default async function DashboardLoupenickaDetailPage({ params }: Props) {
             <div className="card">
                 <div className="flex items-start justify-between gap-4">
                     <div>
-                        <h2 className="mb-1"> Vyber zemi</h2>
+                        <h2 className="mb-1">Vyber zemi</h2>
                     </div>
                     <Suspense fallback={null}>
                         <FadeIn>

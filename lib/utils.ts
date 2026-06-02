@@ -113,7 +113,7 @@ export function isValidGpsString(input: string) {
 }
 
 export function removeIdFromSlugs(strings: string[]): string[] {
-    return strings.map((str) => str.replace(/^\d+-/, ''));
+    return strings.map((str) => (str ? str.replace(/^\d+-/, '') : ''));
 }
 
 export function getIdFromSlug(str: string): number {
