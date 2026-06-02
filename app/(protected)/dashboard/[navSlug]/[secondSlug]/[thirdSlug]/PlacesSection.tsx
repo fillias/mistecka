@@ -1,5 +1,5 @@
 import PlaceCardWithDetail from '@/components/PlaceCardWirhDetail';
-import { getPlacesById } from '@/lib/db/nav';
+// import { getPlacesById } from '@/lib/db/nav';
 import userInfo from '@/lib/userInfo';
 
 type Props = {
@@ -11,8 +11,8 @@ type Props = {
 export default async function PlacesSection({ navId, countryId, areaId }: Props) {
     const { isAdmin, isEditor } = await userInfo();
 
-    const places = await getPlacesById(navId, countryId, areaId);
-
+    // const places = await getPlacesById(navId, countryId, areaId);
+    /*
     if (places.length === 0) {
         return (
             <div className="card flex flex-col items-center py-12 text-center">
@@ -39,4 +39,7 @@ export default async function PlacesSection({ navId, countryId, areaId }: Props)
             </ul>
         </>
     );
+    */
+
+    return <></>;
 }
