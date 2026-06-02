@@ -3,16 +3,15 @@ import { getLoupenickaBySlug, getLoupenicka } from '@/lib/db/nav';
 
 export type Props = {
     path?: string;
-    params: Promise<{ navSlug: string }>;
+    params?: Promise<{ navSlug: string }>;
 };
 
-export default async function Breadcrumb({ path, params }: Props) {
+export async function Breadcrumb({ path, params }: Props) {
     if (!path) return null;
 
     const { navSlug } = await params;
 
     const sections = path.split('/');
-    console.log('sections: ', sections);
 
     const mainSection = sections[0];
 
@@ -21,7 +20,7 @@ export default async function Breadcrumb({ path, params }: Props) {
     const createLoupenickaBreadCrumb = async () => {
         items.push({ label: 'Loupeníčka', href: '/dashboard/loupenicka' });
         const oblast = await getLoupenickaBySlug(navSlug);
-        items.push({ label: oblast.name, href: path });
+        oblast && items.push({ label: oblast.name, href: path });
     };
 
     mainSection === 'loupenicka' && (await createLoupenickaBreadCrumb());
@@ -45,6 +44,14 @@ export default async function Breadcrumb({ path, params }: Props) {
                     );
                 })}
             </ol>
+        </nav>
+    );
+}
+
+export function BreadcrumbPlaceholder() {
+    return (
+        <nav aria-hidden="true" className="mb-2">
+            <div className="h-[20px]" />
         </nav>
     );
 }

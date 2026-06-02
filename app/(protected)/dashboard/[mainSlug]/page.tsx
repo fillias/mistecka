@@ -1,7 +1,7 @@
 // app/dashboard/loupenicka/[navSlug]/page.tsx
 import { Suspense } from 'react';
 
-import Breadcrumb from '@/components/Breadcrumb';
+import { Breadcrumb, BreadcrumbPlaceholder } from '@/components/Breadcrumb';
 import EditorNav from '@/components/EditorNav';
 import CountriesList from './CountriesList';
 

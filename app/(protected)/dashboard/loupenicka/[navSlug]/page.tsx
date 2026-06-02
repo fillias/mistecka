@@ -1,7 +1,7 @@
 // app/dashboard/loupenicka/[navSlug]/page.tsx
 import { Suspense } from 'react';
 
-import Breadcrumb from '@/components/Breadcrumb';
+import { Breadcrumb, BreadcrumbPlaceholder } from '@/components/Breadcrumb';
 import EditorNav from '@/components/EditorNav';
 import HeaderSectionName from './HeaderSectionName';
 import Spinner from '@/app/UI/Spinner';
@@ -16,7 +16,7 @@ type Props = {
 export default async function DashboardLoupenickaDetailPage({ params }: Props) {
     return (
         <div className="page-stack">
-            <Suspense fallback={null}>
+            <Suspense fallback={<BreadcrumbPlaceholder />}>
                 <Breadcrumb path={`loupenicka`} params={params} />
             </Suspense>
 
