@@ -24,7 +24,7 @@ export default async function DashboardLoupenickaPage({ params }: Props) {
                     </div>
                     <Suspense>
                         <FadeIn>
-                            <EditorNav table="loupenicko" type="oblast" />
+                            <EditorNav table="loupenicko" type="oblast" params={params} />
                         </FadeIn>
                     </Suspense>
                 </div>

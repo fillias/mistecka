@@ -1,5 +1,5 @@
 import { getIdFromSlug, removeIdFromSlugs } from '@/lib/utils';
-import { getCountryMisteckaBySlug, getMisteckaBySlug } from '@/lib/db/nav';
+import { getCountryMisteckaBySlug, getMisteckaBySlug, getAreaMisteckaBySlug } from '@/lib/db/nav';
 
 type SectionLabelProps = {
     params?: Promise<{ navSlug: string; secondSlug?: string; thirdSlug?: string }>;
@@ -11,10 +11,12 @@ export default async function SectionLabel({ params }: SectionLabelProps) {
     const navId = getIdFromSlug(navSlug);
     const [mainNavSlug, countryNavSlug, areaNavSlug] = removeIdFromSlugs([navSlug, secondSlug, thirdSlug]);
 
-    const mainNav = await getMisteckaBySlug(mainNavSlug);
+    // const mainNav = await getMisteckaBySlug(mainNavSlug);
     const countryNav = await getCountryMisteckaBySlug(navId, countryNavSlug);
 
-    const label = countryNav ? countryNav.name : null;
+    const areaNav = thirdSlug && (await getAreaMisteckaBySlug(getIdFromSlug(secondSlug), areaNavSlug));
 
-    return <span className="eyebrow mb-3 block">{label}</span>;
+    const label = areaNavSlug ? areaNav.name : countryNav.name;
+
+    return <span className="eyebrow mb-3">{label}</span>;
 }

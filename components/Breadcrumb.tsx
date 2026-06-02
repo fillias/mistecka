@@ -3,6 +3,7 @@ import {
     getLoupenickaBySlug,
     getMisteckaBySlug,
     getCountryMisteckaBySlug,
+    getAreaMisteckaBySlug,
     getCountriesByMisteckaId
 } from '@/lib/db/nav';
 import { removeIdFromSlugs, getIdFromSlug } from '@/lib/utils';
@@ -30,16 +31,12 @@ export async function Breadcrumb({ mainSection, params }: Props) {
         const [mainNavSlug, countryNavSlug, areaNavSlug] = removeIdFromSlugs([navSlug, secondSlug, thirdSlug]);
 
         const mainNav = await getMisteckaBySlug(mainNavSlug);
-        const countryNav = await getCountryMisteckaBySlug(navId, countryNavSlug);
-
-        // console.log('countryNavSlug: ', countryNavSlug);
-        // const countryList = await getCountriesByMisteckaId(navId);
-        // console.log('countryList: ', countryList);
+        const countryNav = secondSlug && (await getCountryMisteckaBySlug(navId, countryNavSlug));
+        const areaNav = thirdSlug && (await getAreaMisteckaBySlug(getIdFromSlug(secondSlug), areaNavSlug));
 
         items.push({ label: mainNav.name, href: `/dashboard/${navSlug}` });
         countryNav && items.push({ label: countryNav.name, href: `/dashboard/${navSlug}/${secondSlug}` });
-
-        // oblast && items.push({ label: oblast.name, href: oblast.slug });
+        areaNav && items.push({ label: areaNav.name, href: `/dashboard/${navSlug}/${secondSlug}/${thirdSlug}` });
     };
 
     mainSection === 'loupenicka' && (await createLoupenickaBreadCrumb());
@@ -54,11 +51,11 @@ export async function Breadcrumb({ mainSection, params }: Props) {
                     return (
                         <li key={index} className="flex items-center gap-2">
                             {!isLast && item.href ? (
-                                <Link href={item.href} className="btn btn-ghost !min-h-0 !px-2 !py-1">
+                                <Link href={item.href} className="btn btn-ghost min-h-0! px-0.5! py-1!">
                                     ← {item.label}
                                 </Link>
                             ) : (
-                                <span className="font-medium text-slate-500">{item.label}</span>
+                                <span className="px-2 font-extrabold text-slate-500 ">{item.label}</span>
                             )}
                         </li>
                     );
