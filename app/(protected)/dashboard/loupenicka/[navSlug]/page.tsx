@@ -4,8 +4,10 @@ import { Suspense } from 'react';
 import Breadcrumb from '@/components/Breadcrumb';
 import EditorNav from '@/components/EditorNav';
 import HeaderSectionName from './HeaderSectionName';
+import Spinner from '@/app/UI/Spinner';
 
 import PlacesList from './PlacesList';
+import { SP } from 'next/dist/shared/lib/utils';
 
 type Props = {
     params: Promise<{ navSlug: string }>;
@@ -32,7 +34,7 @@ export default async function DashboardLoupenickaDetailPage({ params }: Props) {
                 </div>
             </div>
 
-            <Suspense fallback={null}>
+            <Suspense fallback={<Spinner />}>
                 <PlacesList params={params} />
             </Suspense>
         </div>

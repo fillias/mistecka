@@ -9,7 +9,11 @@ export default function Spinner({ label = 'Načítám seznam' }: Props) {
             style={{
                 backgroundColor: 'rgb(var(--surface) / 0.92)',
                 borderColor: 'rgb(var(--border))',
-                color: 'rgb(var(--text))'
+                color: 'rgb(var(--text))',
+                bottom: '0.5rem',
+                position: 'absolute',
+                left: '50%',
+                transform: 'translateX(-50%)'
             }}
             role="status"
             aria-live="polite"

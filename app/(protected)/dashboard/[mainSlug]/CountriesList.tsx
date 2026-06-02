@@ -2,7 +2,6 @@ import Link from 'next/link';
 import { getCountriesByMisteckaId } from '@/lib/db/nav';
 import { getIdFromSlug } from '@/lib/utils';
 import CountryFlag from '@/components/CountryFlag';
-import LoadingLink from '@/components/LoadingLink';
 
 type Props = {
     params: Promise<{ mainSlug: string }>;
@@ -19,7 +18,7 @@ export default async function CountriesList({ params }: Props) {
         <ul className="list-links">
             {countries.map((country) => (
                 <li key={country.id}>
-                    <LoadingLink href={`/dashboard/${mainSlug}/${country.id}-${country.slug}`} className="list-link">
+                    <Link href={`/dashboard/${mainSlug}/${country.id}-${country.slug}`} className="list-link">
                         <div className="flex items-center justify-between gap-3">
                             <div className="flex min-w-0 items-center gap-3">
                                 <CountryFlag
@@ -35,7 +34,7 @@ export default async function CountriesList({ params }: Props) {
 
                             <span className="meta-text shrink-0">→</span>
                         </div>
-                    </LoadingLink>
+                    </Link>
                 </li>
             ))}
         </ul>
