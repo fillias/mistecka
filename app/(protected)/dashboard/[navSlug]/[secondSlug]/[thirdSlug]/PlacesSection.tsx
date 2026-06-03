@@ -1,18 +1,21 @@
 import PlaceCardWithDetail from '@/components/PlaceCardWirhDetail';
-// import { getPlacesById } from '@/lib/db/nav';
+import { getPlacesByAreaMisteckaId } from '@/lib/db/nav';
+import { removeIdFromSlugs, getIdFromSlug } from '@/lib/utils';
+
 import userInfo from '@/lib/userInfo';
 
 type Props = {
-    navId: number;
-    countryId: number;
-    areaId: number;
+    params: Promise<{ navSlug?: string; secondSlug?: string; thirdSlug?: string }>;
 };
 
-export default async function PlacesSection({ navId, countryId, areaId }: Props) {
+export default async function PlacesSection({ params }: Props) {
     const { isAdmin, isEditor } = await userInfo();
+    const { navSlug, secondSlug, thirdSlug } = await params;
 
-    // const places = await getPlacesById(navId, countryId, areaId);
-    /*
+    const areaId = getIdFromSlug(thirdSlug);
+
+    const places = await getPlacesByAreaMisteckaId(areaId);
+
     if (places.length === 0) {
         return (
             <div className="card flex flex-col items-center py-12 text-center">
@@ -33,13 +36,12 @@ export default async function PlacesSection({ navId, countryId, areaId }: Props)
             <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {places.map((place) => (
                     <li key={place.id}>
-                        <PlaceCardWithDetail place={place} canManage={isAdmin || isEditor} />{' '}
+                        <PlaceCardWithDetail kind="mistecka" place={place} canManage={isAdmin || isEditor} />
                     </li>
                 ))}
             </ul>
         </>
     );
-    */
 
     return <></>;
 }

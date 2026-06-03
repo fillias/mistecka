@@ -1,8 +1,9 @@
 import userInfo from '@/lib/userInfo';
-import AddCountryModal from '@/components/AddCountryModal';
-import AddAreaModal from '@/components/AddAreaModal';
+import AddMisteckoCountryModal from '@/components/AddMisteckoCountryModal';
+import AddMisteckoAreaModal from '@/components/AddMisteckoAreaModal';
 import AddLoupenickoModal from './AddLoupenickoModal';
 import AddLoupenickoPlaceModal from './AddLoupenickoPlaceModal';
+import AddMisteckoPlaceModal from './AddMisteckoPlaceModal';
 import {
     getLoupenickaBySlug,
     getMisteckaBySlug,
@@ -38,13 +39,31 @@ export default async function EditorNav({ table, type, params }: EditorNavProps)
 
     if (table === 'mistecko' && type === 'zeme') {
         const navId = getIdFromSlug(navSlug);
-        return <AddCountryModal navId={navId} navSlug={navSlug} />;
+        return <AddMisteckoCountryModal navId={navId} navSlug={navSlug} />;
     }
 
     if (table === 'mistecko' && type === 'oblast') {
         const navId = getIdFromSlug(navSlug);
         const countryId = getIdFromSlug(secondSlug);
-        return <AddAreaModal misteckaId={navId} navSlug={navSlug} countryId={countryId} countrySlug={secondSlug} />;
+        return (
+            <AddMisteckoAreaModal misteckaId={navId} navSlug={navSlug} countryId={countryId} countrySlug={secondSlug} />
+        );
+    }
+
+    if (table === 'mistecko' && type === 'misto') {
+        const misteckaId = getIdFromSlug(navSlug);
+        const countryId = getIdFromSlug(secondSlug);
+        const areaId = getIdFromSlug(thirdSlug);
+        return (
+            <AddMisteckoPlaceModal
+                misteckaId={misteckaId}
+                navSlug={navSlug}
+                countryId={countryId}
+                countrySlug={secondSlug}
+                areaId={areaId}
+                areaSlug={thirdSlug}
+            />
+        );
     }
 
     return <></>;

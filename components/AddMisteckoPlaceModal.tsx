@@ -6,7 +6,7 @@ import type { SubmitEventHandler } from 'react';
 import { isValidGpsString, removeIdFromSlugs } from '@/lib/utils';
 
 type Props = {
-    navId: number;
+    misteckaId: number;
     countryId?: number;
     areaId: number;
     navSlug: string;
@@ -14,7 +14,14 @@ type Props = {
     areaSlug: string;
 };
 
-export default function AddPlaceModal({ navId, countryId, areaId, navSlug, countrySlug, areaSlug }: Props) {
+export default function AddMisteckoPlaceModal({
+    misteckaId,
+    countryId,
+    areaId,
+    navSlug,
+    countrySlug,
+    areaSlug
+}: Props) {
     [navSlug, areaSlug] = removeIdFromSlugs([navSlug, areaSlug]);
     countrySlug && ([countrySlug] = removeIdFromSlugs([countrySlug]));
 
@@ -69,7 +76,7 @@ export default function AddPlaceModal({ navId, countryId, areaId, navSlug, count
         const finalType = options ? (type === 'jiné' ? otherType : type) : otherType;
 
         try {
-            const res = await fetch('/api/add-place', {
+            const res = await fetch('/api/add-mistecko-place', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -77,7 +84,7 @@ export default function AddPlaceModal({ navId, countryId, areaId, navSlug, count
                 body: JSON.stringify({
                     name: name.trim(),
                     description: description.trim(),
-                    navId,
+                    misteckaId,
                     areaId,
                     countryId,
                     type: finalType,

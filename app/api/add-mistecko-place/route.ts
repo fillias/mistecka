@@ -3,8 +3,6 @@ import { revalidateTag } from 'next/cache';
 import userInfo from '@/lib/userInfo';
 import { createAdminClient } from '@/lib/supabase/admin';
 
-import { slugify } from '@/lib/utils';
-
 export async function POST(req: NextRequest) {
     try {
         const user = await userInfo();
@@ -13,53 +11,34 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Nemáte oprávnění.' }, { status: 403 });
         }
 
-        /*
-                body: JSON.stringify({
-                    name: name.trim(),
-                    description: description.trim(),
-                    navId,
-                    areaId,
-                    countryId,
-                    navSlug,
-                    countrySlug,
-                    areaSlug,
-                    type,
-                    gps,
-                    imageUrl
-                })
-        */
-
         const body = await req.json();
-        const navSlug = String(body.navSlug);
-        // const countrySlug = String(body.countrySlug);
-        // const areaSlug = String(body.areaSlug);
-        // const slug = slugify(name);
+
         const name = String(body.name ?? '').trim();
         const type = String(body.type);
         const gps = String(body.gps ?? '').trim();
         const description = String(body.description ?? '').trim();
         const imageUrl = String(body.imageUrl ?? '').trim();
-        const navId = Number(body.navId);
+        const misteckaId = Number(body.misteckaId);
         const countryId = Number(body.countryId) || null;
         const areaId = Number(body.areaId);
 
-        if (!name || !navId) {
+        if (!name || !misteckaId) {
             return NextResponse.json({ error: 'Chybí povinná data.' }, { status: 400 });
         }
 
         const supabase = createAdminClient();
 
         const { data, error } = await supabase
-            .from('place')
+            .from('place_mistecka')
             .insert({
-                place_name: name,
-                place_type: type,
-                place_description: description,
-                place_gps_coords: gps,
-                place_image_url: imageUrl,
-                nav_id: navId,
-                country_id: countryId,
-                area_id: areaId
+                name: name,
+                type: type,
+                description: description,
+                gps_coords: gps,
+                image_url: imageUrl,
+                mistecka_id: misteckaId,
+                country_mistecka_id: countryId,
+                area_mistecka_id: areaId
             })
             .select()
             .single();
@@ -69,8 +48,6 @@ export async function POST(req: NextRequest) {
         }
 
         revalidateTag('navigation-data', 'max');
-
-        // !countrySlug && revalidatePath(`/dashboard/${navSlug}`);
 
         return NextResponse.json(data, { status: 201 });
     } catch {

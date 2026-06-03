@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { Breadcrumb, BreadcrumbPlaceholder } from '@/components/Breadcrumb';
-import SectionLabel from '@/components/SectionLabel';
+import { SectionLabel, SectionLabelPlaceholder } from '@/components/SectionLabel';
 import Spinner from '@/app/UI/Spinner';
 import AreasList from './AreasList';
 import EditorNav from '@/components/EditorNav';
@@ -19,7 +19,7 @@ export default async function SecondLevelPage({ params }: Props) {
             <div className="card">
                 <div className="flex items-start justify-between gap-4">
                     <div>
-                        <Suspense fallback={null}>
+                        <Suspense fallback={<SectionLabelPlaceholder />}>
                             <FadeIn>
                                 <SectionLabel params={params} />
                             </FadeIn>

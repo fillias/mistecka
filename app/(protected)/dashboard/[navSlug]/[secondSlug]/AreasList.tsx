@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { getAreaMisteckaBySlug, getAreasByCountryMisteckaId } from '@/lib/db/nav';
+import { getAreasByCountryMisteckaId } from '@/lib/db/nav';
 import { removeIdFromSlugs, getIdFromSlug } from '@/lib/utils';
 
 type Props = {
@@ -9,7 +9,6 @@ type Props = {
 export default async function AreasList({ params }: Props) {
     const { navSlug, secondSlug, thirdSlug } = await params;
     const countryId = getIdFromSlug(secondSlug);
-    const [mainNavSlug, countryNavSlug, areaNavSlug] = removeIdFromSlugs([navSlug, secondSlug, thirdSlug]);
 
     const areas = await getAreasByCountryMisteckaId(countryId);
 

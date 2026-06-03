@@ -10,7 +10,7 @@ type Props = {
     navSlug: string;
 };
 
-export default function AddCountryModal({ navId, navSlug }: Props) {
+export default function AddMisteckoCountryModal({ navId, navSlug }: Props) {
     const router = useRouter();
     const [open, setOpen] = useState(false);
     const [name, setName] = useState('');
@@ -24,7 +24,7 @@ export default function AddCountryModal({ navId, navSlug }: Props) {
         setError(null);
 
         try {
-            const res = await fetch('/api/add-country', {
+            const res = await fetch('/api/add-mistecko-country', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

@@ -1,6 +1,5 @@
 import DashboardNav from '@/components/DashboardNav';
 import { Suspense } from 'react';
-import Spinner from '../UI/Spinner';
 
 import 'flag-icons/css/flag-icons.min.css';
 
@@ -18,10 +17,3 @@ export default async function ProtectedLayout({ children }: { children: React.Re
         </>
     );
 }
-
-/*
-
-
-
-
-    */

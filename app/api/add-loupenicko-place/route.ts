@@ -44,8 +44,6 @@ export async function POST(req: NextRequest) {
 
         revalidateTag('navigation-data', 'max');
 
-        // !countrySlug && revalidatePath(`/dashboard/${navSlug}`);
-
         return NextResponse.json(data, { status: 201 });
     } catch {
         return NextResponse.json({ error: 'Nepodařilo se vytvořit area.' }, { status: 500 });

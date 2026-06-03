@@ -12,7 +12,7 @@ type Props = {
     countrySlug?: string; // string | undefined
 };
 
-export default function AddAreaModal({ misteckaId, countryId, navSlug, countrySlug }: Props) {
+export default function AddMisteckoAreaModal({ misteckaId, countryId, navSlug, countrySlug }: Props) {
     const router = useRouter();
     const [open, setOpen] = useState(false);
     const [name, setName] = useState('');
@@ -25,7 +25,7 @@ export default function AddAreaModal({ misteckaId, countryId, navSlug, countrySl
         setError(null);
 
         try {
-            const res = await fetch('/api/add-area', {
+            const res = await fetch('/api/add-mistecko-area', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
