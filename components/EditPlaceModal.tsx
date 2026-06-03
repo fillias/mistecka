@@ -7,7 +7,7 @@ import type { Tables } from '@/types/supabase';
 type Place = Tables<'place_loupenicka'> | Tables<'place_mistecka'>;
 
 type Props = {
-    kind: 'loupenicka';
+    kind: 'loupenicka' | 'mistecka';
     open: boolean;
     place: Place;
     onOpenChange: (open: boolean) => void;

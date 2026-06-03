@@ -10,7 +10,7 @@ import EditPlaceModal from '@/components/EditPlaceModal';
 type Place = Tables<'place_loupenicka'> | Tables<'place_mistecka'>;
 
 type Props = {
-    kind: 'loupenicka';
+    kind: 'loupenicka' | 'mistecka';
     place: Place;
     canManage?: boolean;
 };

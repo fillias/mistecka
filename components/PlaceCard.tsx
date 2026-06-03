@@ -6,7 +6,7 @@ import { createMapyCzLink } from '@/lib/utils';
 type Place = Tables<'place_loupenicka'> | Tables<'place_mistecka'>;
 
 type PlaceCardProps = {
-    kind: 'loupenicka';
+    kind: 'loupenicka' | 'mistecka';
     place: Place;
     onOpenDetail: () => void;
 };
