@@ -3,17 +3,13 @@
 import type { Tables } from '@/types/supabase';
 import { createMapyCzLink } from '@/lib/utils';
 
-type PlaceCardProps =
-    | {
-          kind: 'loupenicka';
-          place: Tables<'place_loupenicka'>;
-          onOpenDetail: () => void;
-      }
-    | {
-          kind: 'mistecka';
-          place: Tables<'place_mistecka'>;
-          onOpenDetail: () => void;
-      };
+type Place = Tables<'place_loupenicka'> | Tables<'place_mistecka'>;
+
+type PlaceCardProps = {
+    kind: 'loupenicka';
+    place: Place;
+    onOpenDetail: () => void;
+};
 
 export default function PlaceCard({ kind, place, onOpenDetail }: PlaceCardProps) {
     return (

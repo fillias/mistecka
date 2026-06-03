@@ -38,26 +38,27 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     const { id } = await params;
     const body = await req.json().catch(() => null);
 
-    const place_name = body?.place_name?.trim();
-    const place_type = body?.place_type ?? null;
-    const place_description = body?.place_description ?? null;
-    const place_image_url = body?.place_image_url ?? null;
-    const place_gps_coords = body?.place_gps_coords ?? null;
+    const name = body?.name?.trim();
+    const type = body?.type ?? null;
+    const description = body?.description ?? null;
+    const image_url = body?.image_url ?? null;
+    const gps_coords = body?.gps_coords ?? null;
+    const kind = body?.kind;
 
-    if (!place_name) {
-        return NextResponse.json({ ok: false, error: 'Missing place_name' }, { status: 400 });
+    if (!kind) {
+        return NextResponse.json({ ok: false, error: 'Missing kind' }, { status: 400 });
     }
 
     const admin = getSupabaseAdmin();
 
     const { data, error } = await admin
-        .from('place')
+        .from(`place_${kind}`)
         .update({
-            place_name,
-            place_type,
-            place_description,
-            place_image_url,
-            place_gps_coords
+            name,
+            type,
+            description,
+            image_url,
+            gps_coords
         })
         .eq('id', id)
         .select()
@@ -71,6 +72,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+    const body = await _req.json().catch(() => null);
+
+    const kind = body?.kind;
+
+    if (!kind) {
+        return NextResponse.json({ ok: false, error: 'Missing kind' }, { status: 400 });
+    }
+
     const supabase = await createUserClient();
     const {
         data: { user }
@@ -85,7 +94,7 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
     const { id } = await params;
 
     const admin = getSupabaseAdmin();
-    const { error } = await admin.from('place').delete().eq('id', id);
+    const { error } = await admin.from(`place_${kind}`).delete().eq('id', id);
 
     if (error) {
         return NextResponse.json({ ok: false, error: error.message }, { status: 400 });

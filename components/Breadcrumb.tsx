@@ -1,11 +1,5 @@
 import Link from 'next/link';
-import {
-    getLoupenickaBySlug,
-    getMisteckaBySlug,
-    getCountryMisteckaBySlug,
-    getAreaMisteckaBySlug,
-    getCountriesByMisteckaId
-} from '@/lib/db/nav';
+import { getLoupenickaBySlug, getMisteckaBySlug, getCountryMisteckaBySlug, getAreaMisteckaBySlug } from '@/lib/db/nav';
 import { removeIdFromSlugs, getIdFromSlug } from '@/lib/utils';
 
 export type Props = {

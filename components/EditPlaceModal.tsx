@@ -4,23 +4,17 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Tables } from '@/types/supabase';
 
-type Props =
-    | {
-          kind: 'loupenicka';
-          open: boolean;
-          place: Tables<'place_loupenicka'>;
-          onOpenChange: (open: boolean) => void;
-          onSaved?: (place: Tables<'place_loupenicka'>) => void;
-      }
-    | {
-          kind: 'mistecka';
-          open: boolean;
-          place: Tables<'place_mistecka'>;
-          onOpenChange: (open: boolean) => void;
-          onSaved?: (place: Tables<'place_mistecka'>) => void;
-      };
+type Place = Tables<'place_loupenicka'> | Tables<'place_mistecka'>;
 
-export default function EditPlaceModal({ place, open, onOpenChange, onSaved }: Props) {
+type Props = {
+    kind: 'loupenicka';
+    open: boolean;
+    place: Place;
+    onOpenChange: (open: boolean) => void;
+    onSaved?: (place: Tables<'place_loupenicka'>) => void;
+};
+
+export default function EditPlaceModal({ kind, place, open, onOpenChange, onSaved }: Props) {
     const router = useRouter();
     const firstInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -85,7 +79,8 @@ export default function EditPlaceModal({ place, open, onOpenChange, onSaved }: P
                     type: type.trim() || null,
                     description: description.trim() || null,
                     image_url: imageUrl.trim() || null,
-                    gps_coords: gpsCoords.trim() || null
+                    gps_coords: gpsCoords.trim() || null,
+                    kind: kind
                 })
             });
 

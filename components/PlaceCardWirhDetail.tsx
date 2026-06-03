@@ -7,17 +7,13 @@ import PlaceCard from '@/components/PlaceCard';
 import PlaceDetail from '@/components/PlaceDetail';
 import EditPlaceModal from '@/components/EditPlaceModal';
 
-type Props =
-    | {
-          kind: 'loupenicka';
-          place: Tables<'place_loupenicka'>;
-          canManage?: boolean;
-      }
-    | {
-          kind: 'mistecka';
-          place: Tables<'place_mistecka'>;
-          canManage?: boolean;
-      };
+type Place = Tables<'place_loupenicka'> | Tables<'place_mistecka'>;
+
+type Props = {
+    kind: 'loupenicka';
+    place: Place;
+    canManage?: boolean;
+};
 
 export default function PlaceCardWithDetail(props: Props) {
     const router = useRouter();
@@ -40,7 +36,8 @@ export default function PlaceCardWithDetail(props: Props) {
         try {
             const res = await fetch(`/api/place/${place.id}`, {
                 method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' }
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ kind: props.kind })
             });
 
             const json = await res.json().catch(() => null);

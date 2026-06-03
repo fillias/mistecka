@@ -4,27 +4,18 @@ import { useEffect, useRef, useState } from 'react';
 import type { Tables } from '@/types/supabase';
 import { createMapyCzLink, createGoogleMapsLink } from '@/lib/utils';
 
-type Props =
-    | {
-          kind: 'loupenicka';
-          place: Tables<'place_loupenicka'>;
-          canManage?: boolean;
-          onClose: () => void;
-          onEdit?: (place: Tables<'place_loupenicka'>) => void;
-          onDelete?: (place: Tables<'place_loupenicka'>) => void;
-          deleteLoading?: boolean;
-          deleteError?: string | null;
-      }
-    | {
-          kind: 'mistecka';
-          place: Tables<'place_mistecka'>;
-          canManage?: boolean;
-          onClose: () => void;
-          onEdit?: (place: Tables<'place_mistecka'>) => void;
-          onDelete?: (place: Tables<'place_mistecka'>) => void;
-          deleteLoading?: boolean;
-          deleteError?: string | null;
-      };
+type Place = Tables<'place_loupenicka'> | Tables<'place_mistecka'>;
+
+type Props = {
+    kind: 'loupenicka' | 'mistecka';
+    place: Place;
+    canManage?: boolean;
+    onClose: () => void;
+    onEdit?: (place: Place) => void;
+    onDelete?: (place: Place) => void;
+    deleteLoading?: boolean;
+    deleteError?: string | null;
+};
 
 export default function PlaceDetail(props: Props) {
     const [imageOpen, setImageOpen] = useState(false);
@@ -69,20 +60,10 @@ export default function PlaceDetail(props: Props) {
     };
 
     const handleEdit = () => {
-        if (props.kind === 'loupenicka') {
-            props.onEdit?.(props.place);
-            return;
-        }
-
         props.onEdit?.(props.place);
     };
 
     const handleDelete = () => {
-        if (props.kind === 'loupenicka') {
-            props.onDelete?.(props.place);
-            return;
-        }
-
         props.onDelete?.(props.place);
     };
 
