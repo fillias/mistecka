@@ -2,52 +2,56 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 export async function proxy(request: NextRequest) {
-    let supabaseResponse = NextResponse.next({ request });
+    let response = NextResponse.next({ request });
 
     const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
         {
             cookies: {
-                getAll: () => request.cookies.getAll(),
-                setAll: (cs) => {
-                    cs.forEach(({ name, value }) => request.cookies.set(name, value));
-                    supabaseResponse = NextResponse.next({ request });
-                    cs.forEach(({ name, value, options }) => supabaseResponse.cookies.set(name, value, options));
+                getAll() {
+                    return request.cookies.getAll();
+                },
+                setAll(cookiesToSet) {
+                    cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+                    response = NextResponse.next({ request });
+                    cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
                 }
             }
         }
     );
 
-    // Obnov session — VŽDY musí být před čtením user
     const {
         data: { user }
     } = await supabase.auth.getUser();
 
-    // Chráněné trasy — uprav regex podle svého projektu
+    const pathname = request.nextUrl.pathname;
+
     const isProtected =
-        request.nextUrl.pathname.startsWith('/dashboard') ||
-        request.nextUrl.pathname.startsWith('/admin') ||
-        request.nextUrl.pathname.startsWith('/profile');
+        pathname.startsWith('/dashboard') || pathname.startsWith('/admin') || pathname.startsWith('/profile');
+
+    const isAuthPage = pathname === '/' || pathname === '/login' || pathname === '/signup';
 
     if (isProtected && !user) {
         return NextResponse.redirect(new URL('/login', request.url));
     }
 
-    // Přihlášený uživatel nemá co dělat na /login nebo /signup
-    if ((request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/signup') && user) {
+    if (isAuthPage && user) {
         return NextResponse.redirect(new URL('/dashboard', request.url));
     }
 
-    return supabaseResponse;
+    return response;
 }
 
 export const config = {
-    matcher: ['/dashboard/:path*', '/admin/:path*', '/profile/:path*', '/invite/:path*', '/login', '/signup', '/logout']
+    matcher: [
+        '/',
+        '/dashboard/:path*',
+        '/admin/:path*',
+        '/profile/:path*',
+        '/invite/:path*',
+        '/login',
+        '/signup',
+        '/logout'
+    ]
 };
-
-/*
-export const config = {
-    matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)']
-};
-*/
