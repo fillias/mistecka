@@ -1,12 +1,45 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidateTag } from 'next/cache';
-import { PutObjectCommand } from '@aws-sdk/client-s3';
+import { PutObjectCommand, HeadObjectCommand } from '@aws-sdk/client-s3';
 import userInfo from '@/lib/userInfo';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { s3, S3_BUCKET_UPLOAD } from '@/lib/s3';
+import { s3, S3_BUCKET_UPLOAD, S3_BUCKET_RESIZED } from '@/lib/s3';
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
+const MAX_SIZE = 5 * 1024 * 1024;
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function objectExists(bucket: string, key: string) {
+    try {
+        await s3.send(
+            new HeadObjectCommand({
+                Bucket: bucket,
+                Key: key
+            })
+        );
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+// Poll S3 with HeadObject until both small and large exist.
+async function waitForResizedImages(bucket: string, keys: string[], timeoutMs = 15000, intervalMs = 500) {
+    const startedAt = Date.now();
+
+    while (Date.now() - startedAt < timeoutMs) {
+        const results = await Promise.all(keys.map((key) => objectExists(bucket, key)));
+
+        if (results.every(Boolean)) {
+            return true;
+        }
+
+        await sleep(intervalMs);
+    }
+
+    return false;
+}
 
 export async function POST(req: NextRequest) {
     try {
@@ -41,23 +74,33 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Soubor je větší než 5 MB.' }, { status: 400 });
         }
 
-        // Upload do S3
         const ext = image.name.split('.').pop()?.toLowerCase() ?? 'jpg';
-        const key = `loupenicka/${loupenickaId}/${crypto.randomUUID()}.${ext}`;
+        const fileId = crypto.randomUUID();
+        const uploadKey = `loupenicka/${loupenickaId}/${fileId}.${ext}`;
         const buffer = Buffer.from(await image.arrayBuffer());
 
         await s3.send(
             new PutObjectCommand({
                 Bucket: S3_BUCKET_UPLOAD,
-                Key: key,
+                Key: uploadKey,
                 Body: buffer,
                 ContentType: image.type
             })
         );
 
-        const imageUrl = `https://${S3_BUCKET_UPLOAD}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+        const resizedBase = `loupenicka/${loupenickaId}/resized`;
+        const smallKey = `${resizedBase}/small/${fileId}.webp`;
+        const largeKey = `${resizedBase}/large/${fileId}.webp`;
 
-        // Zápis do Supabase
+        const resizedReady = await waitForResizedImages(S3_BUCKET_RESIZED, [smallKey, largeKey], 20000, 1000);
+
+        if (!resizedReady) {
+            return NextResponse.json({ error: 'Obrázek se neresizoval včas. Zkuste to znovu.' }, { status: 504 });
+        }
+
+        const largeImageUrl = `https://${S3_BUCKET_RESIZED}.s3.${process.env.AWS_REGION}.amazonaws.com/${largeKey}`;
+        const smallImageUrl = `https://${S3_BUCKET_RESIZED}.s3.${process.env.AWS_REGION}.amazonaws.com/${smallKey}`;
+
         const supabase = createAdminClient();
 
         const { data, error } = await supabase
@@ -67,7 +110,8 @@ export async function POST(req: NextRequest) {
                 type,
                 description,
                 gps_coords: gps,
-                image_url: imageUrl,
+                large_image_url: largeImageUrl,
+                small_image_url: smallImageUrl,
                 loupenicka_id: loupenickaId
             })
             .select()
@@ -80,7 +124,10 @@ export async function POST(req: NextRequest) {
         revalidateTag('navigation-data', 'max');
 
         return NextResponse.json(data, { status: 201 });
-    } catch {
-        return NextResponse.json({ error: 'Nepodařilo se vytvořit místo.' }, { status: 500 });
+    } catch (error) {
+        return NextResponse.json(
+            { error: error instanceof Error ? error.message : 'Nepodařilo se vytvořit místo.' },
+            { status: 500 }
+        );
     }
 }

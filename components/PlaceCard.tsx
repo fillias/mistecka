@@ -26,9 +26,14 @@ export default function PlaceCard({ kind, place, onOpenDetail }: PlaceCardProps)
             }}
             aria-label={`Zobrazit detail místa ${place.name}`}
         >
-            {place.image_url && (
+            {place.small_image_url && (
                 <div className="overflow-hidden rounded-xl" style={{ aspectRatio: '16/9' }}>
-                    <img src={place.image_url} alt={place.name} className="h-full w-full object-cover" loading="lazy" />
+                    <img
+                        src={place.small_image_url}
+                        alt={place.name}
+                        className="h-full w-full object-cover"
+                        loading="lazy"
+                    />
                 </div>
             )}
 

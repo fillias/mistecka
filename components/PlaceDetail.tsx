@@ -109,7 +109,7 @@ export default function PlaceDetail(props: Props) {
 
                     <div className="flex-1 overflow-y-auto p-4 sm:p-6">
                         <div className="page-stack">
-                            {place.image_url && (
+                            {place.small_image_url && (
                                 <button
                                     type="button"
                                     onClick={() => setImageOpen(true)}
@@ -117,7 +117,7 @@ export default function PlaceDetail(props: Props) {
                                     aria-label={`Otevřít obrázek místa ${place.name} v plné kvalitě`}
                                 >
                                     <img
-                                        src={place.image_url}
+                                        src={place.small_image_url}
                                         alt={place.name}
                                         className="h-auto max-h-[48vh] w-full object-cover"
                                     />
@@ -285,7 +285,7 @@ export default function PlaceDetail(props: Props) {
                 </div>
             </div>
 
-            {imageOpen && place.image_url && (
+            {imageOpen && place.large_image_url && (
                 <div className="fixed inset-0 z-[60] bg-black">
                     <button
                         type="button"
@@ -323,7 +323,7 @@ export default function PlaceDetail(props: Props) {
                     >
                         <div className="flex min-h-full min-w-full items-center justify-center">
                             <img
-                                src={place.image_url}
+                                src={place.large_image_url}
                                 alt={place.name}
                                 className="block max-w-none object-contain"
                                 style={{

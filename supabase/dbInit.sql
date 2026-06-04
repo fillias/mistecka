@@ -50,7 +50,8 @@ CREATE TABLE place_loupenicka (
             gps_coords ~ '^-?([0-8]?[0-9]|90)(\.[0-9]+)?, -?([0-9]{1,2}|1[0-7][0-9]|180)(\.[0-9]+)?$'
         )
     ),
-    image_url      TEXT,
+    large_image_url     TEXT NOT NULL,
+    small_image_url     TEXT NOT NULL,
     created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -109,7 +110,8 @@ CREATE TABLE place_mistecka (
             gps_coords ~ '^-?([0-8]?[0-9]|90)(\.[0-9]+)?, -?([0-9]{1,2}|1[0-7][0-9]|180)(\.[0-9]+)?$'
         )
     ),
-    image_url           TEXT,
+    large_image_url     TEXT NOT NULL,
+    small_image_url     TEXT NOT NULL,
     created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
