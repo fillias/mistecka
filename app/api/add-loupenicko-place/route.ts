@@ -98,8 +98,8 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Obrázek se neresizoval včas. Zkuste to znovu.' }, { status: 504 });
         }
 
-        const largeImageUrl = `https://${S3_BUCKET_RESIZED}.s3.${process.env.AWS_REGION}.amazonaws.com/${largeKey}`;
-        const smallImageUrl = `https://${S3_BUCKET_RESIZED}.s3.${process.env.AWS_REGION}.amazonaws.com/${smallKey}`;
+        const largeImageUrl = `https://${S3_BUCKET_RESIZED}.s3.${process.env.MISTECKA_AWS_REGION}.amazonaws.com/${largeKey}`;
+        const smallImageUrl = `https://${S3_BUCKET_RESIZED}.s3.${process.env.MISTECKA_AWS_REGION}.amazonaws.com/${smallKey}`;
 
         const supabase = createAdminClient();
 
