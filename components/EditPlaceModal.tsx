@@ -21,7 +21,7 @@ export default function EditPlaceModal({ kind, place, open, onOpenChange, onSave
     const [name, setName] = useState(place.name ?? '');
     const [type, setType] = useState(place.type ?? '');
     const [description, setDescription] = useState(place.description ?? '');
-    const [imageUrl, setImageUrl] = useState(place.image_url ?? '');
+    const [imageUrl, setImageUrl] = useState(place.large_image_url ?? '');
     const [gpsCoords, setGpsCoords] = useState(place.gps_coords ?? '');
 
     const [loading, setLoading] = useState(false);
@@ -33,7 +33,7 @@ export default function EditPlaceModal({ kind, place, open, onOpenChange, onSave
         setName(place.name ?? '');
         setType(place.type ?? '');
         setDescription(place.description ?? '');
-        setImageUrl(place.image_url ?? '');
+        setImageUrl(place.large_image_url ?? '');
         setGpsCoords(place.gps_coords ?? '');
         setError(null);
 
