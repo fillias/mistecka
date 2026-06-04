@@ -1,8 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+
 import { useRouter } from 'next/navigation';
-import type { SubmitEventHandler } from 'react';
+import type { SubmitEventHandler, ChangeEventHandler } from 'react';
+
 import { isValidGpsString, removeIdFromSlugs } from '@/lib/utils';
 
 type Props = {
@@ -100,12 +102,6 @@ export default function AddMisteckoPlaceModal({
             return;
         }
 
-        if (!imageFile) {
-            setError('Vyber obrázek.');
-            setLoading(false);
-            return;
-        }
-
         const finalType = type === 'jiné' ? otherType.trim() : type;
 
         try {
@@ -117,7 +113,7 @@ export default function AddMisteckoPlaceModal({
             formData.append('countryId', String(countryId));
             formData.append('areaId', String(areaId));
             formData.append('gps', gps.trim());
-            formData.append('image', imageFile);
+            imageFile && formData.append('image', imageFile);
 
             const res = await fetch('/api/add-mistecko-place', {
                 method: 'POST',
@@ -280,7 +276,6 @@ export default function AddMisteckoPlaceModal({
                                     type="file"
                                     accept="image/jpeg,image/png,image/webp"
                                     onChange={handleFileChange}
-                                    required
                                     className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none transition file:mr-3 file:rounded file:border-0 file:bg-slate-100 file:px-2 file:py-1 file:text-sm file:font-medium file:text-slate-700 hover:file:bg-slate-200 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:file:bg-slate-800 dark:file:text-slate-200 dark:hover:file:bg-slate-700"
                                 />
                             </div>

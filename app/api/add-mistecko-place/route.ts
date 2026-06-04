@@ -4,6 +4,7 @@ import { PutObjectCommand, HeadObjectCommand } from '@aws-sdk/client-s3';
 import userInfo from '@/lib/userInfo';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { s3, S3_BUCKET_UPLOAD, S3_BUCKET_RESIZED } from '@/lib/s3';
+import { slugify } from '@/lib/utils';
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_SIZE = 5 * 1024 * 1024;
@@ -64,44 +65,51 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Chybí povinná data.' }, { status: 400 });
         }
 
-        if (!(image instanceof File)) {
-            return NextResponse.json({ error: 'Soubor chybí.' }, { status: 400 });
+        let smallImageUrl: string, largeImageUrl: string;
+
+        if (image) {
+            if (!(image instanceof File)) {
+                return NextResponse.json({ error: 'Soubor chybí.' }, { status: 400 });
+            }
+
+            if (!ALLOWED_TYPES.includes(image.type)) {
+                return NextResponse.json({ error: 'Povoleny jsou jen JPG, PNG a WEBP.' }, { status: 400 });
+            }
+
+            if (image.size > MAX_SIZE) {
+                return NextResponse.json({ error: 'Soubor je větší než 5 MB.' }, { status: 400 });
+            }
+
+            const ext = image.name.split('.').pop()?.toLowerCase() ?? 'jpg';
+            const fileId = crypto.randomUUID();
+            const uploadKey = `mistecka/${misteckaId}/${fileId}.${ext}`;
+            const buffer = Buffer.from(await image.arrayBuffer());
+
+            await s3.send(
+                new PutObjectCommand({
+                    Bucket: S3_BUCKET_UPLOAD,
+                    Key: uploadKey,
+                    Body: buffer,
+                    ContentType: image.type
+                })
+            );
+
+            const resizedBase = `mistecka/${misteckaId}/resized`;
+            const smallKey = `${resizedBase}/small/${fileId}.webp`;
+            const largeKey = `${resizedBase}/large/${fileId}.webp`;
+
+            const resizedReady = await waitForResizedImages(S3_BUCKET_RESIZED, [smallKey, largeKey], 20000, 1000);
+
+            if (!resizedReady) {
+                return NextResponse.json({ error: 'Obrázek se neresizoval včas. Zkuste to znovu.' }, { status: 504 });
+            }
+
+            largeImageUrl = `https://${S3_BUCKET_RESIZED}.s3.${process.env.MISTECKA_AWS_REGION}.amazonaws.com/${largeKey}`;
+            smallImageUrl = `https://${S3_BUCKET_RESIZED}.s3.${process.env.MISTECKA_AWS_REGION}.amazonaws.com/${smallKey}`;
+        } else {
+            largeImageUrl = `https://placehold.co/1600x900/1d4ed8/ffffff.webp?text=${slugify(name)}`;
+            smallImageUrl = `https://placehold.co/400x225/2563eb/ffffff.webp?text=${slugify(name)}`;
         }
-
-        if (!ALLOWED_TYPES.includes(image.type)) {
-            return NextResponse.json({ error: 'Povoleny jsou jen JPG, PNG a WEBP.' }, { status: 400 });
-        }
-
-        if (image.size > MAX_SIZE) {
-            return NextResponse.json({ error: 'Soubor je větší než 5 MB.' }, { status: 400 });
-        }
-
-        const ext = image.name.split('.').pop()?.toLowerCase() ?? 'jpg';
-        const fileId = crypto.randomUUID();
-        const uploadKey = `mistecka/${misteckaId}/${fileId}.${ext}`;
-        const buffer = Buffer.from(await image.arrayBuffer());
-
-        await s3.send(
-            new PutObjectCommand({
-                Bucket: S3_BUCKET_UPLOAD,
-                Key: uploadKey,
-                Body: buffer,
-                ContentType: image.type
-            })
-        );
-
-        const resizedBase = `mistecka/${misteckaId}/resized`;
-        const smallKey = `${resizedBase}/small/${fileId}.webp`;
-        const largeKey = `${resizedBase}/large/${fileId}.webp`;
-
-        const resizedReady = await waitForResizedImages(S3_BUCKET_RESIZED, [smallKey, largeKey], 20000, 1000);
-
-        if (!resizedReady) {
-            return NextResponse.json({ error: 'Obrázek se neresizoval včas. Zkuste to znovu.' }, { status: 504 });
-        }
-
-        const largeImageUrl = `https://${S3_BUCKET_RESIZED}.s3.${process.env.MISTECKA_AWS_REGION}.amazonaws.com/${largeKey}`;
-        const smallImageUrl = `https://${S3_BUCKET_RESIZED}.s3.${process.env.MISTECKA_AWS_REGION}.amazonaws.com/${smallKey}`;
 
         const supabase = createAdminClient();
 
