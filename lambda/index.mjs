@@ -16,7 +16,7 @@ const DEST_BUCKET = 'mistecka-app-images-resized-395409815261-eu-central-1-an';
 const ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp'];
 
 const sizes = [
-    { suffix: 'large', width: 1800 },
+    { suffix: 'large', width: 2400 },
     { suffix: 'small', width: 400 }
 ];
 

@@ -1,5 +1,5 @@
 'use client';
-
+import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { useEffect, useRef, useState } from 'react';
 import type { Tables } from '@/types/supabase';
 import { createMapyCzLink, createGoogleMapsLink } from '@/lib/utils';
@@ -290,7 +290,7 @@ export default function PlaceDetail(props: Props) {
                     <button
                         type="button"
                         onClick={() => setImageOpen(false)}
-                        className="absolute right-4 top-4 z-10 inline-flex h-14 w-14 items-center justify-center rounded-full border shadow-lg backdrop-blur-md transition hover:scale-[1.03]"
+                        className="absolute right-4 top-4 z-20 inline-flex h-14 w-14 items-center justify-center rounded-full border shadow-lg backdrop-blur-md transition hover:scale-[1.03]"
                         style={{
                             backgroundColor: 'rgb(var(--surface-2) / 0.85)',
                             borderColor: 'rgb(var(--border))',
@@ -314,27 +314,78 @@ export default function PlaceDetail(props: Props) {
                         </svg>
                     </button>
 
-                    <div
-                        className="h-[100dvh] w-full overflow-auto p-4"
-                        style={{
-                            touchAction: 'pan-x pan-y pinch-zoom',
-                            WebkitOverflowScrolling: 'touch'
-                        }}
+                    <TransformWrapper
+                        initialScale={1}
+                        minScale={1}
+                        maxScale={16}
+                        centerOnInit
+                        doubleClick={{ mode: 'zoomIn', step: 2 }}
+                        pinch={{ step: 5 }}
+                        wheel={{ step: 0.2 }}
+                        panning={{ velocityDisabled: true }}
                     >
-                        <div className="flex min-h-full min-w-full items-center justify-center">
-                            <img
-                                src={place.large_image_url}
-                                alt={place.name}
-                                className="block max-w-none object-contain"
-                                style={{
-                                    maxWidth: '100%',
-                                    maxHeight: '100%',
-                                    width: 'auto',
-                                    height: 'auto'
-                                }}
-                            />
-                        </div>
-                    </div>
+                        {({ zoomIn, zoomOut, resetTransform }) => (
+                            <>
+                                <div
+                                    className="absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2 rounded-full border px-3 py-2 backdrop-blur-md"
+                                    style={{
+                                        backgroundColor: 'rgb(var(--surface-2) / 0.85)',
+                                        borderColor: 'rgb(var(--border))',
+                                        color: 'rgb(var(--text))'
+                                    }}
+                                >
+                                    <button
+                                        type="button"
+                                        onClick={() => zoomOut()}
+                                        className="inline-flex h-10 w-10 items-center justify-center rounded-full border"
+                                        style={{ borderColor: 'rgb(var(--border))' }}
+                                        aria-label="Zoom out"
+                                    >
+                                        −
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        onClick={() => resetTransform()}
+                                        className="inline-flex h-10 items-center justify-center rounded-full border px-4 text-sm"
+                                        style={{ borderColor: 'rgb(var(--border))' }}
+                                    >
+                                        Reset
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        onClick={() => zoomIn()}
+                                        className="inline-flex h-10 w-10 items-center justify-center rounded-full border"
+                                        style={{ borderColor: 'rgb(var(--border))' }}
+                                        aria-label="Zoom in"
+                                    >
+                                        +
+                                    </button>
+                                </div>
+
+                                <div className="flex h-[100dvh] w-full items-center justify-center overflow-hidden p-4">
+                                    <TransformComponent wrapperClass="!h-full !w-full" contentClass="!h-full !w-full">
+                                        <div className="flex h-full w-full items-center justify-center">
+                                            <img
+                                                src={place.large_image_url}
+                                                alt={place.name}
+                                                className="block max-h-none max-w-none object-contain select-none"
+                                                draggable={false}
+                                                style={{
+                                                    maxWidth: '100%',
+                                                    maxHeight: '100%',
+                                                    width: 'auto',
+                                                    height: 'auto',
+                                                    touchAction: 'none'
+                                                }}
+                                            />
+                                        </div>
+                                    </TransformComponent>
+                                </div>
+                            </>
+                        )}
+                    </TransformWrapper>
                 </div>
             )}
         </>
