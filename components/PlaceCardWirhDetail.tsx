@@ -74,7 +74,7 @@ export default function PlaceCardWithDetail(props: Props) {
                 />
             )}
 
-            {canManage && editOpen && (
+            {/* TODO canManage && editOpen && (
                 <EditPlaceModal
                     {...props}
                     open={editOpen}
@@ -84,7 +84,7 @@ export default function PlaceCardWithDetail(props: Props) {
                         router.refresh();
                     }}
                 />
-            )}
+            )*/}
         </>
     );
 }

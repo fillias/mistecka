@@ -2,40 +2,56 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import type { ChangeEventHandler, SubmitEventHandler } from 'react';
 import type { Tables } from '@/types/supabase';
+import { isValidGpsString } from '@/lib/utils';
 
-type Place = Tables<'place_loupenicka'> | Tables<'place_mistecka'>;
+type LoupenickaPlace = Tables<'place_loupenicka'>;
+type MisteckaPlace = Tables<'place_mistecka'>;
 
-type Props = {
-    kind: 'loupenicka' | 'mistecka';
-    open: boolean;
-    place: Place;
-    onOpenChange: (open: boolean) => void;
-    onSaved?: (place: Tables<'place_loupenicka'>) => void;
-};
+type Props =
+    | {
+          kind: 'loupenicka';
+          open: boolean;
+          place: LoupenickaPlace;
+          onOpenChange: (open: boolean) => void;
+          onSaved?: (place: LoupenickaPlace) => void;
+      }
+    | {
+          kind: 'mistecka';
+          open: boolean;
+          place: MisteckaPlace;
+          onOpenChange: (open: boolean) => void;
+          onSaved?: (place: MisteckaPlace) => void;
+      };
 
-export default function EditPlaceModal({ kind, place, open, onOpenChange, onSaved }: Props) {
+export default function EditPlaceModal(props: Props) {
     const router = useRouter();
     const firstInputRef = useRef<HTMLInputElement | null>(null);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-    const [name, setName] = useState(place.name ?? '');
-    const [type, setType] = useState(place.type ?? '');
-    const [description, setDescription] = useState(place.description ?? '');
-    const [imageUrl, setImageUrl] = useState(place.large_image_url ?? '');
-    const [gpsCoords, setGpsCoords] = useState(place.gps_coords ?? '');
+    const [name, setName] = useState('');
+    const [type, setType] = useState('');
+    const [description, setDescription] = useState('');
+    const [gpsCoords, setGpsCoords] = useState('');
+    const [imageFile, setImageFile] = useState<File | null>(null);
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        if (!open) return;
+        if (!props.open) return;
 
-        setName(place.name ?? '');
-        setType(place.type ?? '');
-        setDescription(place.description ?? '');
-        setImageUrl(place.large_image_url ?? '');
-        setGpsCoords(place.gps_coords ?? '');
+        setName(props.place.name ?? '');
+        setType(props.place.type ?? '');
+        setDescription(props.place.description ?? '');
+        setGpsCoords(props.place.gps_coords ?? '');
+        setImageFile(null);
         setError(null);
+
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
 
         const previousOverflow = document.body.style.overflow;
         document.body.style.overflow = 'hidden';
@@ -43,7 +59,7 @@ export default function EditPlaceModal({ kind, place, open, onOpenChange, onSave
         const timer = window.setTimeout(() => firstInputRef.current?.focus(), 0);
 
         const onKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') onOpenChange(false);
+            if (e.key === 'Escape') props.onOpenChange(false);
         };
 
         document.addEventListener('keydown', onKeyDown);
@@ -53,11 +69,37 @@ export default function EditPlaceModal({ kind, place, open, onOpenChange, onSave
             document.body.style.overflow = previousOverflow;
             document.removeEventListener('keydown', onKeyDown);
         };
-    }, [open, place, onOpenChange]);
+    }, [props]);
 
-    if (!open) return null;
+    const handleFileChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+        const file = e.currentTarget.files?.[0] ?? null;
 
-    const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
+        if (!file) {
+            setImageFile(null);
+            return;
+        }
+
+        const allowed = ['image/jpeg', 'image/png', 'image/webp'];
+
+        if (!allowed.includes(file.type)) {
+            setError('Povoleny jsou jen JPG, PNG a WEBP.');
+            e.currentTarget.value = '';
+            setImageFile(null);
+            return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+            setError('Soubor je větší než 5 MB.');
+            e.currentTarget.value = '';
+            setImageFile(null);
+            return;
+        }
+
+        setError(null);
+        setImageFile(file);
+    };
+
+    const handleSubmit: SubmitEventHandler<HTMLFormElement> = async (e) => {
         e.preventDefault();
 
         if (!name.trim()) {
@@ -65,23 +107,29 @@ export default function EditPlaceModal({ kind, place, open, onOpenChange, onSave
             return;
         }
 
+        if (gpsCoords.trim() && !isValidGpsString(gpsCoords.trim())) {
+            setError('Špatný formát GPS.');
+            return;
+        }
+
         setLoading(true);
         setError(null);
 
         try {
-            const res = await fetch(`/api/place/${place.id}`, {
+            const formData = new FormData();
+            formData.append('kind', props.kind);
+            formData.append('name', name.trim());
+            formData.append('type', type.trim());
+            formData.append('description', description.trim());
+            formData.append('gps_coords', gpsCoords.trim());
+
+            if (imageFile) {
+                formData.append('image', imageFile);
+            }
+
+            const res = await fetch(`/api/place/${props.place.id}`, {
                 method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    name: name.trim(),
-                    type: type.trim() || null,
-                    description: description.trim() || null,
-                    image_url: imageUrl.trim() || null,
-                    gps_coords: gpsCoords.trim() || null,
-                    kind: kind
-                })
+                body: formData
             });
 
             const json = await res.json().catch(() => null);
@@ -90,8 +138,13 @@ export default function EditPlaceModal({ kind, place, open, onOpenChange, onSave
                 throw new Error(json?.error || 'Nepodařilo se uložit změny');
             }
 
-            onSaved?.(json.place);
-            onOpenChange(false);
+            if (props.kind === 'loupenicka') {
+                props.onSaved?.(json.place as LoupenickaPlace);
+            } else {
+                props.onSaved?.(json.place as MisteckaPlace);
+            }
+
+            props.onOpenChange(false);
             router.refresh();
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Nepodařilo se uložit změny');
@@ -100,9 +153,11 @@ export default function EditPlaceModal({ kind, place, open, onOpenChange, onSave
         }
     };
 
+    if (!props.open) return null;
+
     return (
         <>
-            <div className="fixed inset-0 z-[70] bg-black/60" onClick={() => onOpenChange(false)} />
+            <div className="fixed inset-0 z-[70] bg-black/60" onClick={() => props.onOpenChange(false)} />
 
             <div className="fixed inset-0 z-[80] flex items-end sm:items-center sm:justify-center sm:p-6">
                 <div
@@ -114,7 +169,7 @@ export default function EditPlaceModal({ kind, place, open, onOpenChange, onSave
                 >
                     <button
                         type="button"
-                        onClick={() => onOpenChange(false)}
+                        onClick={() => props.onOpenChange(false)}
                         className="absolute right-4 top-4 rounded-full px-3 py-2 text-sm"
                         style={{ backgroundColor: 'rgb(var(--surface-2))', color: 'rgb(var(--text))' }}
                         aria-label="Zavřít editaci místa"
@@ -159,16 +214,6 @@ export default function EditPlaceModal({ kind, place, open, onOpenChange, onSave
                         </label>
 
                         <label className="grid gap-2">
-                            <span className="text-sm font-medium">URL obrázku</span>
-                            <input
-                                value={imageUrl}
-                                onChange={(e) => setImageUrl(e.target.value)}
-                                className="input"
-                                type="url"
-                            />
-                        </label>
-
-                        <label className="grid gap-2">
                             <span className="text-sm font-medium">GPS souřadnice</span>
                             <input
                                 value={gpsCoords}
@@ -178,6 +223,26 @@ export default function EditPlaceModal({ kind, place, open, onOpenChange, onSave
                             />
                         </label>
 
+                        <label className="grid gap-2">
+                            <span className="text-sm font-medium">Nahrát nový obrázek</span>
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/jpeg,image/png,image/webp"
+                                onChange={handleFileChange}
+                                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none transition file:mr-3 file:rounded file:border-0 file:bg-slate-100 file:px-2 file:py-1 file:text-sm file:font-medium file:text-slate-700 hover:file:bg-slate-200 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:file:bg-slate-800 dark:file:text-slate-200 dark:hover:file:bg-slate-700"
+                            />
+                            <span className="text-xs" style={{ color: 'rgb(var(--text-muted))' }}>
+                                Když nic nevybereš, zůstane stávající obrázek.
+                            </span>
+                        </label>
+
+                        {imageFile && (
+                            <p className="text-sm" style={{ color: 'rgb(var(--text-muted))' }}>
+                                Vybraný soubor: {imageFile.name}
+                            </p>
+                        )}
+
                         {error && (
                             <p className="text-sm" style={{ color: 'rgb(var(--danger))' }}>
                                 {error}
@@ -185,7 +250,7 @@ export default function EditPlaceModal({ kind, place, open, onOpenChange, onSave
                         )}
 
                         <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-                            <button type="button" onClick={() => onOpenChange(false)} className="btn">
+                            <button type="button" onClick={() => props.onOpenChange(false)} className="btn">
                                 Zrušit
                             </button>
                             <button type="submit" className="btn btn-primary" disabled={loading}>
