@@ -54,7 +54,7 @@ export default function AddMisteckoPlaceModal({
     let options;
 
     switch (navSlug) {
-        case 'parkovani':
+        case 'mistecka':
             options = parkingTypes;
             break;
         case 'loupenicko':
