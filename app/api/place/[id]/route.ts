@@ -7,7 +7,7 @@ import { revalidateTag } from 'next/cache';
 import { PutObjectCommand, HeadObjectCommand } from '@aws-sdk/client-s3';
 import userInfo from '@/lib/userInfo';
 
-import { s3, S3_BUCKET_UPLOAD, S3_BUCKET_RESIZED } from '@/lib/s3';
+import { s3, S3_BUCKET_UPLOAD, S3_BUCKET_RESIZED, keyFromUrl, deleteS3Objects } from '@/lib/s3';
 import { slugify } from '@/lib/utils';
 
 function getSupabaseAdmin() {
@@ -154,6 +154,23 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
         const admin = getSupabaseAdmin();
 
+        if (image) {
+            const { data: existing } = await admin
+                .from(`place_${kind}`)
+                .select('small_image_url, large_image_url')
+                .eq('id', placeId)
+                .single();
+
+            if (existing) {
+                const oldKeys = [
+                    existing.small_image_url ? keyFromUrl(existing.small_image_url) : null,
+                    existing.large_image_url ? keyFromUrl(existing.large_image_url) : null
+                ].filter((k): k is string => k !== null);
+
+                await deleteS3Objects(S3_BUCKET_RESIZED, oldKeys);
+            }
+        }
+
         const { data, error } = await admin
             .from(`place_${kind}`)
             .update(updatePlaceObject)
@@ -181,8 +198,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-    // TODO delete file z aws
-
+    const { id: placeId } = await params;
     const body = await _req.json().catch(() => null);
 
     const kind = body?.kind;
@@ -205,7 +221,25 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
     const { id } = await params;
 
     const admin = getSupabaseAdmin();
+
+    // Načteme URLs obrázků před smazáním záznamu
+    const { data: existing } = await admin
+        .from(`place_${kind}`)
+        .select('small_image_url, large_image_url')
+        .eq('id', placeId)
+        .single();
+
     const { error } = await admin.from(`place_${kind}`).delete().eq('id', id);
+
+    // Smazat resized obrázky z S3
+    if (existing) {
+        const oldKeys = [
+            existing.small_image_url ? keyFromUrl(existing.small_image_url) : null,
+            existing.large_image_url ? keyFromUrl(existing.large_image_url) : null
+        ].filter((k): k is string => k !== null);
+
+        await deleteS3Objects(S3_BUCKET_RESIZED, oldKeys);
+    }
 
     if (error) {
         return NextResponse.json({ ok: false, error: error.message }, { status: 400 });

@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
             }
 
             const ext = image.name.split('.').pop()?.toLowerCase() ?? 'jpg';
-            const fileId = crypto.randomUUID();
+            const fileId = `${slugify(name)}-${crypto.randomUUID()}`;
             const uploadKey = `mistecka/M-${misteckaId}/C-${countryId}/A-${areaId}/${fileId}.${ext}`;
             const buffer = Buffer.from(await image.arrayBuffer());
 
