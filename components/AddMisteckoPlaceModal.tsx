@@ -38,7 +38,16 @@ export default function AddMisteckoPlaceModal({
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const parkingTypes = ['parkoviště', 'kemp', 'stání se spaním', 'stání bez spaní', 'hřbitov', 'pláž', 'jiné'];
+    const parkingTypes = [
+        'parkoviště se spaním',
+        'parkoviště bez spaní',
+        'kemp',
+        'stání se spaním',
+        'stání bez spaní',
+        'hřbitov',
+        'pláž',
+        'jiné'
+    ];
 
     console.log('navSlug: ', navSlug);
 
