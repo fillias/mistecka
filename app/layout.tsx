@@ -29,10 +29,7 @@ export default function RootLayout({ children }) {
             </head>
             <body>
                 <div className="app-shell">
-                    <div className="app-container flex min-h-dvh flex-col">
-                        {children}
-                        <Footer />
-                    </div>
+                    <div className="app-container flex min-h-dvh flex-col">{children}</div>
                 </div>
             </body>
         </html>

@@ -1,5 +1,6 @@
 import DashboardNav from '@/components/DashboardNav';
 import { Suspense } from 'react';
+import FooterDashboard from '@/components/FooterDashboard';
 
 import 'flag-icons/css/flag-icons.min.css';
 
@@ -14,6 +15,9 @@ export default async function ProtectedLayout({ children }: { children: React.Re
                 </div>
             </header>
             <main className="page-stack">{children}</main>
+            <Suspense>
+                <FooterDashboard />
+            </Suspense>
         </>
     );
 }
