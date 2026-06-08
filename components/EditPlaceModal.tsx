@@ -118,6 +118,16 @@ export default function EditPlaceModal(props: Props) {
             formData.append('gps_coords', gpsCoords.trim());
             if (imageFile) formData.append('image', imageFile);
 
+            if (props.kind === 'loupenicka') {
+                formData.append('loupenicka_id', String(props.place.loupenicka_id));
+            }
+
+            if (props.kind === 'mistecka') {
+                formData.append('mistecka_id', String(props.place.mistecka_id));
+                formData.append('country_mistecka_id', String(props.place.country_mistecka_id));
+                formData.append('area_mistecka_id', String(props.place.area_mistecka_id));
+            }
+
             const res = await fetch(`/api/place/${props.place.id}`, {
                 method: 'PATCH',
                 body: formData
