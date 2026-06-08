@@ -39,30 +39,12 @@ export default function AddMisteckoPlaceModal({
     const [error, setError] = useState<string | null>(null);
 
     const parkingTypes = ['parkoviště', 'kemp', 'stání se spaním', 'stání bez spaní', 'hřbitov', 'pláž', 'jiné'];
-    const loupenickoTypes = [
-        'jablíčka',
-        'švestky',
-        'třešně',
-        'lusky',
-        'hrušky',
-        'ořechy',
-        'houby',
-        'borůvky',
-        'brusinky',
-        'jiné'
-    ];
+
+    console.log('navSlug: ', navSlug);
+
     let options;
 
-    switch (navSlug) {
-        case 'mistecka':
-            options = parkingTypes;
-            break;
-        case 'loupenicko':
-            options = loupenickoTypes;
-            break;
-        default:
-            options = null;
-    }
+    navSlug === 'parkovani' && (options = parkingTypes);
 
     const handleFileChange: ChangeEventHandler<HTMLInputElement> = (e) => {
         const file = e.currentTarget.files?.[0] ?? null;
