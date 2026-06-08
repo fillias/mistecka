@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
 
             const ext = image.name.split('.').pop()?.toLowerCase() ?? 'jpg';
             const fileId = `${slugify(name)}-${crypto.randomUUID()}`;
-            const uploadKey = `loupenicka/${loupenickaId}/${fileId}.${ext}`;
+            const uploadKey = `loupenicka/A-${loupenickaId}/${fileId}.${ext}`;
             const buffer = Buffer.from(await image.arrayBuffer());
 
             await s3.send(
@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
                 })
             );
 
-            const resizedBase = `loupenicka/${loupenickaId}/resized`;
+            const resizedBase = `loupenicka/A-${loupenickaId}/resized`;
             const smallKey = `${resizedBase}/small/${fileId}.webp`;
             const largeKey = `${resizedBase}/large/${fileId}.webp`;
 

@@ -7,13 +7,9 @@ import PlaceCard from '@/components/PlaceCard';
 import PlaceDetail from '@/components/PlaceDetail';
 import EditPlaceModal from '@/components/EditPlaceModal';
 
-type Place = Tables<'place_loupenicka'> | Tables<'place_mistecka'>;
-
-type Props = {
-    kind: 'loupenicka' | 'mistecka';
-    place: Place;
-    canManage?: boolean;
-};
+type Props =
+    | { kind: 'loupenicka'; place: Tables<'place_loupenicka'>; canManage?: boolean }
+    | { kind: 'mistecka'; place: Tables<'place_mistecka'>; canManage?: boolean };
 
 export default function PlaceCardWithDetail(props: Props) {
     const router = useRouter();
@@ -74,7 +70,7 @@ export default function PlaceCardWithDetail(props: Props) {
                 />
             )}
 
-            {/* TODO canManage && editOpen && (
+            {canManage && editOpen && (
                 <EditPlaceModal
                     {...props}
                     open={editOpen}
@@ -84,7 +80,7 @@ export default function PlaceCardWithDetail(props: Props) {
                         router.refresh();
                     }}
                 />
-            )*/}
+            )}
         </>
     );
 }

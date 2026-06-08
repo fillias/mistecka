@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
 
             const ext = image.name.split('.').pop()?.toLowerCase() ?? 'jpg';
             const fileId = crypto.randomUUID();
-            const uploadKey = `mistecka/${misteckaId}/${fileId}.${ext}`;
+            const uploadKey = `mistecka/M-${misteckaId}/C-${countryId}/A-${areaId}/${fileId}.${ext}`;
             const buffer = Buffer.from(await image.arrayBuffer());
 
             await s3.send(
@@ -94,7 +94,7 @@ export async function POST(req: NextRequest) {
                 })
             );
 
-            const resizedBase = `mistecka/${misteckaId}/resized`;
+            const resizedBase = `mistecka/M-${misteckaId}/C-${countryId}/A-${areaId}/resized`;
             const smallKey = `${resizedBase}/small/${fileId}.webp`;
             const largeKey = `${resizedBase}/large/${fileId}.webp`;
 

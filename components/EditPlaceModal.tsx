@@ -35,7 +35,6 @@ export default function EditPlaceModal(props: Props) {
     const [description, setDescription] = useState('');
     const [gpsCoords, setGpsCoords] = useState('');
     const [imageFile, setImageFile] = useState<File | null>(null);
-
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -49,9 +48,7 @@ export default function EditPlaceModal(props: Props) {
         setImageFile(null);
         setError(null);
 
-        if (fileInputRef.current) {
-            fileInputRef.current.value = '';
-        }
+        if (fileInputRef.current) fileInputRef.current.value = '';
 
         const previousOverflow = document.body.style.overflow;
         document.body.style.overflow = 'hidden';
@@ -61,7 +58,6 @@ export default function EditPlaceModal(props: Props) {
         const onKeyDown = (e: KeyboardEvent) => {
             if (e.key === 'Escape') props.onOpenChange(false);
         };
-
         document.addEventListener('keydown', onKeyDown);
 
         return () => {
@@ -80,7 +76,6 @@ export default function EditPlaceModal(props: Props) {
         }
 
         const allowed = ['image/jpeg', 'image/png', 'image/webp'];
-
         if (!allowed.includes(file.type)) {
             setError('Povoleny jsou jen JPG, PNG a WEBP.');
             e.currentTarget.value = '';
@@ -106,7 +101,6 @@ export default function EditPlaceModal(props: Props) {
             setError('Název místa je povinný.');
             return;
         }
-
         if (gpsCoords.trim() && !isValidGpsString(gpsCoords.trim())) {
             setError('Špatný formát GPS.');
             return;
@@ -122,10 +116,7 @@ export default function EditPlaceModal(props: Props) {
             formData.append('type', type.trim());
             formData.append('description', description.trim());
             formData.append('gps_coords', gpsCoords.trim());
-
-            if (imageFile) {
-                formData.append('image', imageFile);
-            }
+            if (imageFile) formData.append('image', imageFile);
 
             const res = await fetch(`/api/place/${props.place.id}`, {
                 method: 'PATCH',
@@ -134,9 +125,7 @@ export default function EditPlaceModal(props: Props) {
 
             const json = await res.json().catch(() => null);
 
-            if (!res.ok) {
-                throw new Error(json?.error || 'Nepodařilo se uložit změny');
-            }
+            if (!res.ok) throw new Error(json?.error || 'Nepodařilo se uložit změny');
 
             if (props.kind === 'loupenicka') {
                 props.onSaved?.(json.place as LoupenickaPlace);
@@ -155,111 +144,154 @@ export default function EditPlaceModal(props: Props) {
 
     if (!props.open) return null;
 
-    return (
-        <>
-            <div className="fixed inset-0 z-[70] bg-black/60" onClick={() => props.onOpenChange(false)} />
+    const inputCls =
+        'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-500 focus:ring-2 focus:ring-slate-300 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-slate-500 dark:focus:ring-slate-700';
 
-            <div className="fixed inset-0 z-[80] flex items-end sm:items-center sm:justify-center sm:p-6">
-                <div
-                    role="dialog"
-                    aria-modal="true"
-                    aria-labelledby="edit-place-title"
-                    className="relative w-full max-w-2xl rounded-t-3xl border bg-[rgb(var(--surface))] shadow-2xl sm:rounded-3xl"
-                    style={{ borderColor: 'rgb(var(--border))' }}
-                >
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm dark:bg-black/70">
+            <div
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="edit-place-title"
+                className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl dark:border-slate-800 dark:bg-slate-900"
+            >
+                {/* Header */}
+                <div className="mb-5 flex items-start justify-between gap-4">
+                    <div>
+                        <h2
+                            id="edit-place-title"
+                            className="text-base font-semibold text-slate-800 dark:text-slate-100"
+                        >
+                            Upravit místo
+                        </h2>
+                        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                            Uprav údaje místa v sekci{' '}
+                            <strong>{props.kind === 'loupenicka' ? 'Loupeníčko' : 'Místečka'}</strong>
+                        </p>
+                    </div>
+
                     <button
                         type="button"
                         onClick={() => props.onOpenChange(false)}
-                        className="absolute right-4 top-4 rounded-full px-3 py-2 text-sm"
-                        style={{ backgroundColor: 'rgb(var(--surface-2))', color: 'rgb(var(--text))' }}
-                        aria-label="Zavřít editaci místa"
+                        className="rounded-md px-2 py-1 text-sm text-slate-500 transition hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+                        aria-label="Zavřít modal"
                     >
                         ✕
                     </button>
-
-                    <form onSubmit={handleSubmit} className="page-stack p-4 sm:p-6">
-                        <div>
-                            <h2
-                                id="edit-place-title"
-                                className="text-xl font-semibold"
-                                style={{ color: 'rgb(var(--text))' }}
-                            >
-                                Upravit místo
-                            </h2>
-                        </div>
-
-                        <label className="grid gap-2">
-                            <span className="text-sm font-medium">Název</span>
-                            <input
-                                ref={firstInputRef}
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                className="input"
-                                required
-                            />
-                        </label>
-
-                        <label className="grid gap-2">
-                            <span className="text-sm font-medium">Typ</span>
-                            <input value={type} onChange={(e) => setType(e.target.value)} className="input" />
-                        </label>
-
-                        <label className="grid gap-2">
-                            <span className="text-sm font-medium">Popis</span>
-                            <textarea
-                                value={description}
-                                onChange={(e) => setDescription(e.target.value)}
-                                className="input min-h-32"
-                            />
-                        </label>
-
-                        <label className="grid gap-2">
-                            <span className="text-sm font-medium">GPS souřadnice</span>
-                            <input
-                                value={gpsCoords}
-                                onChange={(e) => setGpsCoords(e.target.value)}
-                                className="input"
-                                placeholder="49.123456,15.123456"
-                            />
-                        </label>
-
-                        <label className="grid gap-2">
-                            <span className="text-sm font-medium">Nahrát nový obrázek</span>
-                            <input
-                                ref={fileInputRef}
-                                type="file"
-                                accept="image/jpeg,image/png,image/webp"
-                                onChange={handleFileChange}
-                                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none transition file:mr-3 file:rounded file:border-0 file:bg-slate-100 file:px-2 file:py-1 file:text-sm file:font-medium file:text-slate-700 hover:file:bg-slate-200 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:file:bg-slate-800 dark:file:text-slate-200 dark:hover:file:bg-slate-700"
-                            />
-                            <span className="text-xs" style={{ color: 'rgb(var(--text-muted))' }}>
-                                Když nic nevybereš, zůstane stávající obrázek.
-                            </span>
-                        </label>
-
-                        {imageFile && (
-                            <p className="text-sm" style={{ color: 'rgb(var(--text-muted))' }}>
-                                Vybraný soubor: {imageFile.name}
-                            </p>
-                        )}
-
-                        {error && (
-                            <p className="text-sm" style={{ color: 'rgb(var(--danger))' }}>
-                                {error}
-                            </p>
-                        )}
-
-                        <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-                            <button type="button" onClick={() => props.onOpenChange(false)} className="btn">
-                                Zrušit
-                            </button>
-                            <button type="submit" className="btn btn-primary" disabled={loading}>
-                                {loading ? 'Ukládám…' : 'Uložit změny'}
-                            </button>
-                        </div>
-                    </form>
                 </div>
+
+                {/* Form */}
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <label
+                            htmlFor="edit-name"
+                            className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-200"
+                        >
+                            Název místa
+                        </label>
+                        <input
+                            id="edit-name"
+                            ref={firstInputRef}
+                            type="text"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            required
+                            placeholder="Např. Bota"
+                            className={`mb-3 ${inputCls}`}
+                        />
+
+                        <label
+                            htmlFor="edit-type"
+                            className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-200"
+                        >
+                            Typ místa
+                        </label>
+                        <input
+                            id="edit-type"
+                            type="text"
+                            value={type}
+                            onChange={(e) => setType(e.target.value)}
+                            placeholder="Např. jablíčka"
+                            className={`mb-3 ${inputCls}`}
+                        />
+
+                        <label
+                            htmlFor="edit-gps"
+                            className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-200"
+                        >
+                            GPS souřadnice
+                        </label>
+                        <input
+                            id="edit-gps"
+                            type="text"
+                            value={gpsCoords}
+                            onChange={(e) => setGpsCoords(e.target.value)}
+                            placeholder="49.123456,15.123456"
+                            className={`mb-3 ${inputCls}`}
+                        />
+
+                        <label
+                            htmlFor="edit-description"
+                            className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-200"
+                        >
+                            Popis místa
+                        </label>
+                        <textarea
+                            id="edit-description"
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            placeholder="Např. placatá voda na SZ vítr"
+                            className={`mb-3 ${inputCls}`}
+                        />
+
+                        <label
+                            htmlFor="edit-image"
+                            className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-200"
+                        >
+                            Nahrát nový obrázek
+                        </label>
+                        <input
+                            id="edit-image"
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp"
+                            onChange={handleFileChange}
+                            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none transition file:mr-3 file:rounded file:border-0 file:bg-slate-100 file:px-2 file:py-1 file:text-sm file:font-medium file:text-slate-700 hover:file:bg-slate-200 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:file:bg-slate-800 dark:file:text-slate-200 dark:hover:file:bg-slate-700"
+                        />
+                        <p className="mt-1.5 text-xs text-slate-400 dark:text-slate-500">
+                            Když nic nevybereš, zůstane stávající obrázek.
+                        </p>
+                    </div>
+
+                    {imageFile && (
+                        <p className="text-sm text-slate-500 dark:text-slate-400">Vybraný soubor: {imageFile.name}</p>
+                    )}
+
+                    {error && (
+                        <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-300">
+                            {error}
+                        </div>
+                    )}
+
+                    <div className="flex justify-end gap-2 pt-2">
+                        <button
+                            type="button"
+                            onClick={() => props.onOpenChange(false)}
+                            className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+                        >
+                            Zrušit
+                        </button>
+
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
+                        >
+                            {loading ? 'Ukládám…' : 'Uložit změny'}
+                        </button>
+                    </div>
+                </form>
             </div>
-        </>
+        </div>
     );
 }

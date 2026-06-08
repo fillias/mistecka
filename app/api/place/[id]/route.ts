@@ -76,12 +76,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         const kind = String(formData.get('kind'));
         const description = String(formData.get('description') ?? '').trim();
         const image = formData.get('image');
-
+        console.log('kind: ', kind);
         console.log('formData: ', formData);
-
+        return;
         // TODO
 
-        /*
         let smallImageUrl: string, largeImageUrl: string;
 
         if (image) {
@@ -151,7 +150,6 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         revalidateTag('navigation-data', 'max');
 
         return NextResponse.json(data, { status: 201 });
-        */
     } catch (error) {
         return NextResponse.json(
             { error: error instanceof Error ? error.message : 'Nepodařilo se vytvořit místo.' },
