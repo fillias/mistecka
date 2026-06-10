@@ -17,7 +17,7 @@ export async function SectionLabel({ params }: SectionLabelProps) {
 
     const label = areaNavSlug ? areaNav.name : countryNav.name;
 
-    return <span className="eyebrow mb-3 h-5">{label}</span>;
+    return <span className="eyebrow mb-3 min-h-5">{label}</span>;
 }
 
 export function SectionLabelPlaceholder() {
