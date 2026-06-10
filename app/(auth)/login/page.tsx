@@ -13,7 +13,15 @@ export default function LoginPage() {
         <>
             <section className="flex min-h-[70vh] items-center justify-center py-10 sm:min-h-[80vh] sm:py-16">
                 <div className="w-full max-w-md">
-                    <Suspense fallback={<Spinner />}>
+                    {/* <Spinner /> */}
+                    <Suspense
+                        fallback={
+                            <div className="flex justify-center items-center ">
+                                <h1>Přihlašuji...</h1>
+                                <Spinner />
+                            </div>
+                        }
+                    >
                         <FadeIn>
                             <LoginForm />
                         </FadeIn>
