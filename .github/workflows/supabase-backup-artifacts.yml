@@ -1,9 +1,10 @@
 name: Supabase backup to artifacts
 
 on:
-    schedule:
-        - cron: '0 2 * * *' # Every day at 2:00 UTC
-    workflow_dispatch: # Manual trigger from GitHub Actions UI
+    workflow_dispatch:
+
+env:
+    FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 permissions:
     contents: read
@@ -11,52 +12,36 @@ permissions:
 jobs:
     backup:
         runs-on: ubuntu-latest
-
         steps:
-            - name: Checkout repository
-              uses: actions/checkout@v4
+            - uses: actions/checkout@v4
 
-            - name: Setup Supabase CLI
-              uses: supabase/setup-cli@v1
+            - uses: supabase/setup-cli@v1
+              with:
+                  version: latest
 
-            - name: Create backup directory
-              run: mkdir -p supabase-backup
+            - name: Show CLI version
+              run: supabase --version
 
-            - name: Dump roles (permissions)
-              run: supabase db dump --db-url "$SUPABASE_DB_URL" -f supabase-backup/roles.sql --role-only
+            - name: Verify secret exists
               env:
                   SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-
-            - name: Dump schema (structure)
-              run: supabase db dump --db-url "$SUPABASE_DB_URL" -f supabase-backup/schema.sql
-              env:
-                  SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-
-            - name: Dump data (table contents)
-              run: supabase db dump --db-url "$SUPABASE_DB_URL" -f supabase-backup/data.sql --use-copy --data-only -x "storage.buckets_vectors" -x "storage.vector_indexes"
-              env:
-                  SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-
-            - name: Create timestamp
-              id: timestamp
-              run: echo "timestamp=$(date +%Y-%m-%d_%H-%M-%S)" >> $GITHUB_OUTPUT
-
-            - name: Compress backup to ZIP
               run: |
-                  cd supabase-backup
-                  zip -r supabase-backup-${{ steps.timestamp.outputs.timestamp }}.zip .
+                  test -n "$SUPABASE_DB_URL" || (echo "Missing SUPABASE_DB_URL" && exit 1)
 
-            - name: Upload backup as artifact
+            - name: Dump schema
+              env:
+                  SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+              run: supabase db dump --db-url "$SUPABASE_DB_URL" -f schema.sql
+
+            - name: Dump data
+              env:
+                  SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+              run: supabase db dump --db-url "$SUPABASE_DB_URL" -f data.sql --data-only --use-copy
+
+            - name: Upload artifact
               uses: actions/upload-artifact@v4
               with:
-                  name: supabase-backup-${{ steps.timestamp.outputs.timestamp }}
-                  path: supabase-backup/supabase-backup-${{ steps.timestamp.outputs.timestamp }}.zip
-                  retention-days: 90 # GitHub default is 90 days
-                  compression-level: 0 # Already compressed
-
-            - name: Show backup info
-              run: |
-                  echo "Backup created: supabase-backup-${{ steps.timestamp.outputs.timestamp }}.zip"
-                  ls -lh supabase-backup/
-                  echo "Artifact name: supabase-backup-${{ steps.timestamp.outputs.timestamp }}"
-                  echo "Download from: GitHub Actions -> Artifacts"
+                  name: supabase-backup
+                  path: |
+                      schema.sql
+                      data.sql
