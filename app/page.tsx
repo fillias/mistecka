@@ -1,6 +1,6 @@
-import Link from 'next/link';
 import Image from 'next/image';
 import { Footer } from '@/components/Footer';
+import LoginLink from '@/components/LoginLink';
 
 export default async function Page() {
     return (
@@ -22,9 +22,8 @@ export default async function Page() {
                     <p className="mt-3 max-w-sm">Přihlas se a pokračuj do přehledu svých oblíbených míst.</p>
 
                     <div className="mt-8 flex w-full justify-center">
-                        <Link href="/login" className="btn btn-primary btn-lg w-full sm:w-auto sm:min-w-48">
-                            Login
-                        </Link>
+                        {/* clienSide LoginLink kvuli netlify cold start */}
+                        <LoginLink />
                     </div>
                 </div>
             </section>
