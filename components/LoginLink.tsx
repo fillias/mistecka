@@ -15,7 +15,7 @@ export default function LoginLink() {
                 className="btn btn-primary btn-lg w-full sm:w-auto sm:min-w-48"
                 onClick={() => startTransition(() => router.push('/login'))}
             >
-                {isPending ? 'Přihlašuji...' : 'Login'}
+                {isPending ? 'Načítám...' : 'Login'}
             </button>
 
             {isPending && <Spinner />}
