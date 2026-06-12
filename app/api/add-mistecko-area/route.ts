@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: error.message }, { status: 400 });
         }
 
-        revalidateTag('navigation-data', 'max');
+        revalidateTag('navigation-data', { expire: 0 });
 
         return NextResponse.json(data, { status: 201 });
     } catch {
