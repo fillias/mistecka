@@ -70,7 +70,9 @@ export default function AddMisteckoAreaModal({ misteckaId, countryId, navSlug, c
                     <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl dark:border-slate-800 dark:bg-slate-900">
                         <div className="mb-5 flex items-start justify-between gap-4">
                             <div>
-                                <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Nová země</h3>
+                                <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+                                    Nová oblast
+                                </h3>
                                 <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                                     Přidání nové oblasti do sekce {removeIdFromSlugs([navSlug]).toString()}
                                     {countrySlug && ` > ${removeIdFromSlugs([countrySlug]).toString()}`}
