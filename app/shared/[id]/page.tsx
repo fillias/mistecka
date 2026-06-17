@@ -3,6 +3,7 @@ import SharedPlaceClient from './SharedPlaceClient';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Suspense } from 'react';
+import Spinner from '@/app/UI/Spinner';
 
 type SharedPlacePageProps = {
     params: Promise<{ id: string }>;
@@ -103,7 +104,7 @@ const CreateSharedPlacePage = async ({ params }: SharedPlacePageProps) => {
 
 export default async function SharedPlacePage({ params }: SharedPlacePageProps) {
     return (
-        <Suspense>
+        <Suspense fallback={<Spinner />}>
             <CreateSharedPlacePage params={params} />
         </Suspense>
     );
