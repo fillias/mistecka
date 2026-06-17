@@ -15,17 +15,21 @@ type Props = {
     onDelete?: (place: Place) => void;
     deleteLoading?: boolean;
     deleteError?: string | null;
+    showShare?: boolean;
 };
 
 export default function PlaceDetail(props: Props) {
     const [imageOpen, setImageOpen] = useState(false);
     const [gpsCopied, setGpsCopied] = useState(false);
+    const [shareLoading, setShareLoading] = useState(false);
+    const [shareCopied, setShareCopied] = useState(false);
     const closeButtonRef = useRef<HTMLButtonElement | null>(null);
 
     const place = props.place;
     const canManage = props.canManage ?? false;
     const deleteLoading = props.deleteLoading ?? false;
     const deleteError = props.deleteError ?? null;
+    const showShare = props.showShare ?? true;
 
     useEffect(() => {
         const previousOverflow = document.body.style.overflow;
@@ -59,6 +63,32 @@ export default function PlaceDetail(props: Props) {
         }
     };
 
+    const handleShare = async () => {
+        setShareLoading(true);
+        try {
+            const res = await fetch('/api/share', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ placeId: place.id, kind: props.kind })
+            });
+
+            const json = await res.json().catch(() => null);
+
+            if (!res.ok) {
+                throw new Error(json?.error || 'Nepodařilo se vytvořit odkaz pro sdílení.');
+            }
+
+            await navigator.clipboard.writeText(json.shareUrl);
+            setShareCopied(true);
+            window.setTimeout(() => setShareCopied(false), 2000);
+        } catch (error) {
+            console.error('Failed to share place:', error);
+            alert(error instanceof Error ? error.message : 'Nepodařilo se sdílet místo.');
+        } finally {
+            setShareLoading(false);
+        }
+    };
+
     const handleEdit = () => {
         props.onEdit?.(props.place);
     };
@@ -71,7 +101,9 @@ export default function PlaceDetail(props: Props) {
         <>
             <div className="fixed inset-0 z-40 bg-black/60" onClick={props.onClose} />
 
-            <div className="fixed inset-0 z-50 flex items-end sm:items-center sm:justify-center sm:p-6">
+            <div
+                className={`fixed inset-0 z-50 flex ${showShare ? 'items-end' : 'items-center'} sm:items-center sm:justify-center sm:p-6`}
+            >
                 <div
                     role="dialog"
                     aria-modal="true"
@@ -144,51 +176,71 @@ export default function PlaceDetail(props: Props) {
                                 )}
                             </div>
 
-                            <div className="flex flex-row items-center gap-3">
+                            <div className="flex flex-row items-center gap-3 w-full">
                                 {place.gps_coords && (
-                                    <>
-                                        <div
-                                            className="flex flex-row items-center gap-3"
-                                            role="group"
-                                            aria-label="Map links"
+                                    <div
+                                        className="flex flex-row items-center gap-3"
+                                        role="group"
+                                        aria-label="Map links"
+                                    >
+                                        <a
+                                            href={createMapyCzLink(place.gps_coords)}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex h-11 w-11 items-center justify-center transition hover:scale-[1.03]"
+                                            aria-label="Open in Mapy.cz"
+                                            title="Open in Mapy.cz"
                                         >
-                                            <a
-                                                href={createMapyCzLink(place.gps_coords)}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="inline-flex h-11 w-11 items-center justify-center transition hover:scale-[1.03]"
-                                                aria-label="Open in Mapy.cz"
-                                                title="Open in Mapy.cz"
-                                            >
-                                                <img
-                                                    src="/images/Mapycz_icon.svg"
-                                                    alt=""
-                                                    aria-hidden="true"
-                                                    className="h-10 w-auto"
-                                                />
-                                            </a>
+                                            <img
+                                                src="/images/Mapycz_icon.svg"
+                                                alt=""
+                                                aria-hidden="true"
+                                                className="h-10 w-auto"
+                                            />
+                                        </a>
 
-                                            <a
-                                                href={createGoogleMapsLink(place.gps_coords)}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="inline-flex h-11 w-11 items-center justify-center transition hover:scale-[1.03]"
-                                                aria-label="Open in Google Maps"
-                                                title="Open in Google Maps"
-                                            >
-                                                <img
-                                                    src="/images/Google_Maps_icon.svg"
-                                                    alt=""
-                                                    aria-hidden="true"
-                                                    className="h-10 w-auto"
-                                                />
-                                            </a>
-                                        </div>
+                                        <a
+                                            href={createGoogleMapsLink(place.gps_coords)}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex h-11 w-11 items-center justify-center transition hover:scale-[1.03]"
+                                            aria-label="Open in Google Maps"
+                                            title="Open in Google Maps"
+                                        >
+                                            <img
+                                                src="/images/Google_Maps_icon.svg"
+                                                alt=""
+                                                aria-hidden="true"
+                                                className="h-10 w-auto"
+                                            />
+                                        </a>
+                                    </div>
+                                )}
 
+                                <div className="ml-auto flex items-center gap-2">
+                                    {showShare && (
+                                        <button
+                                            type="button"
+                                            onClick={handleShare}
+                                            className="inline-flex h-11 items-center justify-center rounded-full border px-4 text-sm font-medium transition hover:bg-black/5 disabled:opacity-50"
+                                            style={{
+                                                borderColor: 'rgb(var(--border))',
+                                                backgroundColor: shareCopied ? 'rgb(var(--surface-2))' : 'transparent',
+                                                color: 'rgb(var(--text))'
+                                            }}
+                                            aria-label="Sdílet místo"
+                                            title="Sdílet místo"
+                                            disabled={shareLoading}
+                                        >
+                                            {shareLoading ? 'Načítám...' : shareCopied ? 'Odkaz zkopírován' : 'Sdílet'}
+                                        </button>
+                                    )}
+
+                                    {place.gps_coords && (
                                         <button
                                             type="button"
                                             onClick={handleCopyGps}
-                                            className="ml-auto inline-flex h-11 items-center justify-center rounded-full border px-4 text-sm font-medium transition hover:bg-black/5"
+                                            className="inline-flex h-11 items-center justify-center rounded-full border px-4 text-sm font-medium transition hover:bg-black/5"
                                             style={{
                                                 borderColor: 'rgb(var(--border))',
                                                 backgroundColor: gpsCopied ? 'rgb(var(--surface-2))' : 'transparent',
@@ -199,8 +251,8 @@ export default function PlaceDetail(props: Props) {
                                         >
                                             {gpsCopied ? 'Zkopírováno' : 'Zkopírovat GPS'}
                                         </button>
-                                    </>
-                                )}
+                                    )}
+                                </div>
                             </div>
 
                             {canManage && (

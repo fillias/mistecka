@@ -140,3 +140,23 @@ CREATE INDEX idx_place_mistecka_country_mistecka_id
 
 CREATE INDEX idx_place_mistecka_area_mistecka_id
     ON place_mistecka (area_mistecka_id);
+
+
+-- ============================================================
+-- SHARED PLACES
+-- ============================================================
+
+CREATE TABLE shared_places (
+    id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    kind                TEXT NOT NULL CHECK (kind IN ('loupenicka', 'mistecka')),
+    place_loupenicka_id BIGINT REFERENCES place_loupenicka(id) ON DELETE CASCADE,
+    place_mistecka_id   BIGINT REFERENCES place_mistecka(id) ON DELETE CASCADE,
+    expires_at          TIMESTAMPTZ NOT NULL DEFAULT NOW() + INTERVAL '72 hours',
+    created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT check_single_place CHECK (
+        (kind = 'loupenicka' AND place_loupenicka_id IS NOT NULL AND place_mistecka_id IS NULL) OR
+        (kind = 'mistecka' AND place_mistecka_id IS NOT NULL AND place_loupenicka_id IS NULL)
+    )
+);
+
+CREATE INDEX idx_shared_places_expires_at ON shared_places (expires_at);

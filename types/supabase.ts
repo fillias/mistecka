@@ -247,6 +247,48 @@ export type Database = {
           },
         ]
       }
+      shared_places: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          kind: string
+          place_loupenicka_id: number | null
+          place_mistecka_id: number | null
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          kind: string
+          place_loupenicka_id?: number | null
+          place_mistecka_id?: number | null
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          kind?: string
+          place_loupenicka_id?: number | null
+          place_mistecka_id?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shared_places_place_loupenicka_id_fkey"
+            columns: ["place_loupenicka_id"]
+            isOneToOne: false
+            referencedRelation: "place_loupenicka"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shared_places_place_mistecka_id_fkey"
+            columns: ["place_mistecka_id"]
+            isOneToOne: false
+            referencedRelation: "place_mistecka"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never

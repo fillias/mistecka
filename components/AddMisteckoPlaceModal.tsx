@@ -49,8 +49,6 @@ export default function AddMisteckoPlaceModal({
         'jiné'
     ];
 
-    console.log('navSlug: ', navSlug);
-
     let options;
 
     navSlug === 'parkovani' && (options = parkingTypes);
