@@ -1,6 +1,7 @@
 import PlaceCardWithDetail from '@/components/PlaceCardWirhDetail';
 import { getPlacesByAreaMisteckaId } from '@/lib/db/nav';
 import { removeIdFromSlugs, getIdFromSlug } from '@/lib/utils';
+import PlacesListWrapper from '@/components/PlacesListWrapper';
 
 import userInfo from '@/lib/userInfo';
 
@@ -27,21 +28,5 @@ export default async function PlacesSection({ params }: Props) {
         );
     }
 
-    return (
-        <>
-            <p>
-                {places.length} {places.length === 1 ? 'místo' : 'míst'} v této oblasti
-            </p>
-
-            <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {places.map((place) => (
-                    <li key={place.id}>
-                        <PlaceCardWithDetail kind="mistecka" place={place} canManage={isAdmin || isEditor} />
-                    </li>
-                ))}
-            </ul>
-        </>
-    );
-
-    return <></>;
+    return <PlacesListWrapper kind="mistecka" places={places} canManage={isAdmin || isEditor} />;
 }

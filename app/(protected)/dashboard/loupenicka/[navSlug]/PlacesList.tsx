@@ -2,6 +2,7 @@
 import { getPlacesByLoupenickaId, getLoupenickaBySlug } from '@/lib/db/nav';
 import PlaceCardWithDetail from '@/components/PlaceCardWirhDetail';
 import userInfo from '@/lib/userInfo';
+import PlacesListWrapper from '@/components/PlacesListWrapper';
 
 type Props = {
     params: Promise<{ navSlug: string }>;
@@ -26,19 +27,5 @@ export default async function PlacesList({ params }: Props) {
         );
     }
 
-    return (
-        <>
-            <p>
-                {places.length} {places.length === 1 ? 'místo' : 'míst'} v této oblasti
-            </p>
-
-            <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {places.map((place) => (
-                    <li key={place.id}>
-                        <PlaceCardWithDetail kind="loupenicka" place={place} canManage={isAdmin || isEditor} />
-                    </li>
-                ))}
-            </ul>
-        </>
-    );
+    return <PlacesListWrapper kind="loupenicka" places={places} canManage={isAdmin || isEditor} />;
 }
