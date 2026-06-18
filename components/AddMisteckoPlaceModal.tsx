@@ -91,7 +91,7 @@ export default function AddMisteckoPlaceModal({
             return;
         }
 
-        const finalType = type === 'jiné' ? otherType.trim() : type;
+        const finalType = type === 'jiné' || !options ? otherType.trim() : type;
 
         try {
             const formData = new FormData();
