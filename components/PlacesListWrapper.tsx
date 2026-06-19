@@ -41,7 +41,7 @@ export default function PlacesListWrapper(props: Props) {
                         id="place-type"
                         value={selectedType}
                         onChange={(e) => setSelectedType(e.target.value)}
-                        className="mb-3 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-300 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:focus:border-slate-500 dark:focus:ring-slate-700"
+                        className="mb-3 w-full sm:w-auto  rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-300 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:focus:border-slate-500 dark:focus:ring-slate-700"
                     >
                         <option value="vše">vše</option>
                         {placeTypes.map((option) => (
