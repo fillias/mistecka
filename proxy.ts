@@ -2,7 +2,13 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 export async function proxy(request: NextRequest) {
-    let response = NextResponse.next({ request });
+    const requestHeaders = new Headers(request.headers);
+
+    let response = NextResponse.next({
+        request: {
+            headers: requestHeaders
+        }
+    });
 
     const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -14,7 +20,11 @@ export async function proxy(request: NextRequest) {
                 },
                 setAll(cookiesToSet) {
                     cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-                    response = NextResponse.next({ request });
+                    response = NextResponse.next({
+                        request: {
+                            headers: requestHeaders
+                        }
+                    });
                     cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
                 }
             }
@@ -24,6 +34,18 @@ export async function proxy(request: NextRequest) {
     const {
         data: { user }
     } = await supabase.auth.getUser();
+
+    if (user) {
+        requestHeaders.set('x-user-id', user.id);
+        requestHeaders.set('x-user-email', user.email || '');
+        requestHeaders.set('x-user-roles', JSON.stringify(user.app_metadata?.roles || []));
+
+        response = NextResponse.next({
+            request: {
+                headers: requestHeaders
+            }
+        });
+    }
 
     const pathname = request.nextUrl.pathname;
 
