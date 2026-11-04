@@ -1,35 +1,40 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 
 type Theme = 'dark' | 'light';
 
+function subscribe(callback: () => void) {
+    const observer = new MutationObserver(callback);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    window.addEventListener('storage', callback);
+    return () => {
+        observer.disconnect();
+        window.removeEventListener('storage', callback);
+    };
+}
+
+function getSnapshot(): Theme {
+    const theme = document.documentElement.getAttribute('data-theme');
+    return theme === 'light' ? 'light' : 'dark';
+}
+
+function getServerSnapshot(): Theme {
+    return 'dark';
+}
+
+function subscribeMounted() {
+    return () => {};
+}
+
 export default function ThemeToggle() {
-    const [theme, setTheme] = useState<Theme>('dark');
-    const [mounted, setMounted] = useState(false);
-
-    useEffect(() => {
-        const root = document.documentElement;
-        const currentTheme = root.getAttribute('data-theme');
-
-        if (currentTheme === 'light' || currentTheme === 'dark') {
-            setTheme(currentTheme);
-        } else {
-            root.setAttribute('data-theme', 'dark');
-            localStorage.setItem('theme', 'dark');
-            setTheme('dark');
-        }
-
-        setMounted(true);
-    }, []);
+    const mounted = useSyncExternalStore(subscribeMounted, () => true, () => false);
+    const theme = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
     function toggleTheme() {
-        const root = document.documentElement;
         const nextTheme: Theme = theme === 'dark' ? 'light' : 'dark';
-
-        root.setAttribute('data-theme', nextTheme);
+        document.documentElement.setAttribute('data-theme', nextTheme);
         localStorage.setItem('theme', nextTheme);
-        setTheme(nextTheme);
     }
 
     const isDark = theme === 'dark';
