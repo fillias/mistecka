@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient as createAdminClient } from '@supabase/supabase-js';
-import { createClient as createUserClient } from '@/lib/supabase/server';
+import userInfo from '@/lib/userInfo';
 import { assertSameOrigin } from '@/lib/csrf';
 
 function getSupabaseAdmin() {
@@ -18,14 +18,9 @@ export async function POST(req: NextRequest) {
     try {
         assertSameOrigin(req);
 
-        const supabase = await createUserClient();
-        const {
-            data: { user }
-        } = await supabase.auth.getUser();
+        const user = await userInfo();
 
-        const roles: string[] = user?.app_metadata?.roles ?? [];
-
-        if (!user || !roles.includes('admin')) {
+        if (!user.isAdmin) {
             return NextResponse.json({ ok: false, error: 'Forbidden' }, { status: 403 });
         }
 

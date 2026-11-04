@@ -3,6 +3,10 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 export async function proxy(request: NextRequest) {
     const requestHeaders = new Headers(request.headers);
+    // Odstranění potenciálně podvržených interních hlaviček z klientského requestu
+    requestHeaders.delete('x-user-id');
+    requestHeaders.delete('x-user-email');
+    requestHeaders.delete('x-user-roles');
 
     let response = NextResponse.next({
         request: {
@@ -34,18 +38,6 @@ export async function proxy(request: NextRequest) {
     const {
         data: { user }
     } = await supabase.auth.getUser();
-
-    if (user) {
-        requestHeaders.set('x-user-id', user.id);
-        requestHeaders.set('x-user-email', user.email || '');
-        requestHeaders.set('x-user-roles', JSON.stringify(user.app_metadata?.roles || []));
-
-        response = NextResponse.next({
-            request: {
-                headers: requestHeaders
-            }
-        });
-    }
 
     const pathname = request.nextUrl.pathname;
 

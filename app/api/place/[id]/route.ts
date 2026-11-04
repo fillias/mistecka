@@ -1,7 +1,4 @@
-// import { NextRequest, NextResponse } from 'next/server';
 import { createClient as createAdminClient } from '@supabase/supabase-js';
-import { createClient as createUserClient } from '@/lib/supabase/server';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidateTag } from 'next/cache';
 import { PutObjectCommand, HeadObjectCommand } from '@aws-sdk/client-s3';
@@ -182,10 +179,6 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
             return NextResponse.json({ ok: false, error: error.message }, { status: 400 });
         }
 
-        if (error) {
-            return NextResponse.json({ error: error.message }, { status: 400 });
-        }
-
         revalidateTag('navigation-data', { expire: 0 });
 
         return NextResponse.json(data, { status: 201 });
@@ -207,18 +200,11 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
         return NextResponse.json({ ok: false, error: 'Missing kind' }, { status: 400 });
     }
 
-    const supabase = await createUserClient();
-    const {
-        data: { user }
-    } = await supabase.auth.getUser();
+    const user = await userInfo();
 
-    const roles: string[] = user?.app_metadata?.roles ?? [];
-
-    if (!user || (!roles.includes('admin') && !roles.includes('editor'))) {
+    if (!user.isAdmin && !user.isEditor) {
         return NextResponse.json({ ok: false, error: 'Forbidden' }, { status: 403 });
     }
-
-    const { id } = await params;
 
     const admin = getSupabaseAdmin();
 
@@ -229,7 +215,7 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
         .eq('id', placeId)
         .single();
 
-    const { error } = await admin.from(`place_${kind}`).delete().eq('id', id);
+    const { error } = await admin.from(`place_${kind}`).delete().eq('id', placeId);
 
     // Smazat resized obrázky z S3
     if (existing) {
