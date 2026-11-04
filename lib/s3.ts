@@ -27,9 +27,9 @@ export async function deleteS3Objects(bucket: string, keys: string[]) {
 
     const result = await s3.send(
         new DeleteObjectsCommand({
-            Bucket: S3_BUCKET_RESIZED,
+            Bucket: bucket,
             Delete: { Objects: validKeys.map((Key) => ({ Key })) }
         })
     );
-    console.log('result: ', result);
+    return result;
 }
