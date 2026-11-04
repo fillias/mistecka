@@ -44,7 +44,7 @@ export async function proxy(request: NextRequest) {
     const isProtected =
         pathname.startsWith('/dashboard') || pathname.startsWith('/admin') || pathname.startsWith('/profile');
 
-    const isAuthPage = pathname === '/' || pathname === '/login' || pathname === '/signup';
+    const isAuthPage = pathname === '/' || pathname === '/login';
 
     if (isProtected && !user) {
         return NextResponse.redirect(new URL('/login', request.url));
@@ -58,5 +58,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ['/dashboard/:path*', '/admin/:path*', '/profile/:path*', '/invite/:path*', '/login', '/signup', '/logout']
+    matcher: ['/dashboard/:path*', '/admin/:path*', '/profile/:path*', '/invite/:path*', '/login', '/logout']
 };
