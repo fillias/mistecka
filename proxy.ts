@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 export async function proxy(request: NextRequest) {
     const requestHeaders = new Headers(request.headers);
-    // Odstranění potenciálně podvržených interních hlaviček z klientského requestu
+
     requestHeaders.delete('x-user-id');
     requestHeaders.delete('x-user-email');
     requestHeaders.delete('x-user-roles');
@@ -23,21 +23,26 @@ export async function proxy(request: NextRequest) {
                     return request.cookies.getAll();
                 },
                 setAll(cookiesToSet) {
-                    cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+                    cookiesToSet.forEach(({ name, value }) => {
+                        request.cookies.set(name, value);
+                    });
+
                     response = NextResponse.next({
                         request: {
                             headers: requestHeaders
                         }
                     });
-                    cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
+
+                    cookiesToSet.forEach(({ name, value, options }) => {
+                        response.cookies.set(name, value, options);
+                    });
                 }
             }
         }
     );
 
-    const {
-        data: { user }
-    } = await supabase.auth.getUser();
+    const { data } = await supabase.auth.getClaims();
+    const claims = data?.claims ?? null;
 
     const pathname = request.nextUrl.pathname;
 
@@ -46,15 +51,23 @@ export async function proxy(request: NextRequest) {
 
     const isAuthPage = pathname === '/' || pathname === '/login';
 
-    if (isProtected && !user) {
-        return NextResponse.redirect(new URL('/login', request.url));
+    if (isProtected && !claims) {
+        return copyCookiesToRedirect(response, NextResponse.redirect(new URL('/login', request.url)));
     }
 
-    if (isAuthPage && user) {
-        return NextResponse.redirect(new URL('/dashboard', request.url));
+    if (isAuthPage && claims) {
+        return copyCookiesToRedirect(response, NextResponse.redirect(new URL('/dashboard', request.url)));
     }
 
     return response;
+}
+
+function copyCookiesToRedirect(source: NextResponse, target: NextResponse) {
+    for (const cookie of source.cookies.getAll()) {
+        target.cookies.set(cookie);
+    }
+
+    return target;
 }
 
 export const config = {
