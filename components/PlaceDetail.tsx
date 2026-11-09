@@ -108,7 +108,7 @@ export default function PlaceDetail(props: Props) {
                     role="dialog"
                     aria-modal="true"
                     aria-labelledby="place-detail-title"
-                    className="relative flex max-h-[100dvh] w-full max-w-3xl flex-col overflow-hidden rounded-t-3xl border bg-[rgb(var(--surface))] shadow-2xl sm:max-h-[90vh] sm:rounded-3xl pb-8 sm:pb-0"
+                    className="relative flex max-h-[100dvh] w-full max-w-3xl flex-col overflow-hidden rounded-t-3xl border bg-[rgb(var(--surface))] shadow-2xl sm:max-h-[90vh] sm:rounded-3xl pb-9 sm:pb-0"
                     style={{ borderColor: 'rgb(var(--border))' }}
                 >
                     <button
