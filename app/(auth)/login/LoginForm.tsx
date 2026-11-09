@@ -12,7 +12,11 @@ export default function LoginForm() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const next = searchParams.get('next') || '/dashboard';
+    const rawNext = searchParams.get('next');
+    const safeNext =
+        rawNext && rawNext.startsWith('/') && !rawNext.startsWith('//') && rawNext !== '/login'
+            ? rawNext
+            : '/dashboard';
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -32,7 +36,7 @@ export default function LoginForm() {
                 throw new Error(data.error || 'Login failed');
             }
 
-            router.push(next);
+            window.location.assign(safeNext);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Login failed');
         } finally {
