@@ -8,41 +8,35 @@ export type UserInfo = {
     isAdmin: boolean;
     isEditor: boolean;
     email: string | null;
-    userId: string | null;
 };
 
 const getUserInfo = cache(async (): Promise<UserInfo> => {
     try {
         const supabase = await createClient();
 
-        const {
-            data: { user },
-            error
-        } = await supabase.auth.getUser();
+        const { data } = await supabase.auth.getClaims();
+        const claims = data?.claims ?? null;
 
-        if (error || !user) {
+        if (!claims) {
             return {
                 isAdmin: false,
                 isEditor: false,
-                email: null,
-                userId: null
+                email: null
             };
         }
 
-        const roles: string[] = user.app_metadata?.roles ?? [];
+        const roles: string[] = claims.app_metadata?.roles ?? [];
 
         return {
             isAdmin: roles.includes('admin'),
             isEditor: roles.includes('editor'),
-            email: user.email ?? null,
-            userId: user.id
+            email: claims.email ?? null
         };
     } catch {
         return {
             isAdmin: false,
             isEditor: false,
-            email: null,
-            userId: null
+            email: null
         };
     }
 });
