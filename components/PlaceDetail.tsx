@@ -31,6 +31,29 @@ export default function PlaceDetail(props: Props) {
     const deleteError = props.deleteError ?? null;
     const showShare = props.showShare ?? true;
 
+    const [smallImgSrc, setSmallImgSrc] = useState(place.small_image_url);
+    const [smallRetry, setSmallRetry] = useState(0);
+    const [largeImgSrc, setLargeImgSrc] = useState(place.large_image_url);
+    const [largeRetry, setLargeRetry] = useState(0);
+
+    const handleSmallImageError = () => {
+        if (smallRetry < 4) {
+            setTimeout(() => {
+                setSmallRetry((prev) => prev + 1);
+                setSmallImgSrc(`${place.small_image_url}?retry=${Date.now()}`);
+            }, 1500);
+        }
+    };
+
+    const handleLargeImageError = () => {
+        if (largeRetry < 4) {
+            setTimeout(() => {
+                setLargeRetry((prev) => prev + 1);
+                setLargeImgSrc(`${place.large_image_url}?retry=${Date.now()}`);
+            }, 1500);
+        }
+    };
+
     useEffect(() => {
         const previousOverflow = document.body.style.overflow;
         document.body.style.overflow = 'hidden';
@@ -149,9 +172,10 @@ export default function PlaceDetail(props: Props) {
                                     aria-label={`Otevřít obrázek místa ${place.name} v plné kvalitě`}
                                 >
                                     <img
-                                        src={place.small_image_url}
+                                        src={smallImgSrc}
                                         alt={place.name}
                                         className="h-auto max-h-[48vh] w-full object-cover"
+                                        onError={handleSmallImageError}
                                     />
                                 </button>
                             )}
@@ -420,10 +444,11 @@ export default function PlaceDetail(props: Props) {
                                     <TransformComponent wrapperClass="!h-full !w-full" contentClass="!h-full !w-full">
                                         <div className="flex h-full w-full items-center justify-center">
                                             <img
-                                                src={place.large_image_url}
+                                                src={largeImgSrc}
                                                 alt={place.name}
                                                 className="block max-h-none max-w-none object-contain select-none"
                                                 draggable={false}
+                                                onError={handleLargeImageError}
                                                 style={{
                                                     maxWidth: '100%',
                                                     maxHeight: '100%',

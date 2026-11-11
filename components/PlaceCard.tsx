@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import type { Tables } from '@/types/supabase';
 import { createMapyCzLink } from '@/lib/utils';
 
@@ -12,6 +13,25 @@ type PlaceCardProps = {
 };
 
 export default function PlaceCard({ kind, place, onOpenDetail }: PlaceCardProps) {
+    const [currentUrl, setCurrentUrl] = useState(place.small_image_url);
+    const [imgSrc, setImgSrc] = useState(place.small_image_url);
+    const [retryCount, setRetryCount] = useState(0);
+
+    if (place.small_image_url !== currentUrl) {
+        setCurrentUrl(place.small_image_url);
+        setImgSrc(place.small_image_url);
+        setRetryCount(0);
+    }
+
+    const handleImageError = () => {
+        if (retryCount < 4) {
+            setTimeout(() => {
+                setRetryCount((prev) => prev + 1);
+                setImgSrc(`${place.small_image_url}?retry=${Date.now()}`);
+            }, 1500);
+        }
+    };
+
     return (
         <article
             className="card flex h-full cursor-pointer flex-col gap-3"
@@ -26,13 +46,14 @@ export default function PlaceCard({ kind, place, onOpenDetail }: PlaceCardProps)
             }}
             aria-label={`Zobrazit detail místa ${place.name}`}
         >
-            {place.small_image_url && (
+            {imgSrc && (
                 <div className="overflow-hidden rounded-xl" style={{ aspectRatio: '16/9' }}>
                     <img
-                        src={place.small_image_url}
+                        src={imgSrc}
                         alt={place.name}
                         className="h-full w-full object-cover"
                         loading="lazy"
+                        onError={handleImageError}
                     />
                 </div>
             )}

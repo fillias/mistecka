@@ -1,11 +1,8 @@
 import { createClient as createAdminClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidateTag } from 'next/cache';
-import { PutObjectCommand, HeadObjectCommand } from '@aws-sdk/client-s3';
 import userInfo from '@/lib/userInfo';
-
-import { s3, S3_BUCKET_UPLOAD, S3_BUCKET_RESIZED, keyFromUrl, deleteS3Objects } from '@/lib/s3';
-import { slugify } from '@/lib/utils';
+import { S3_BUCKET_RESIZED, keyFromUrl, deleteS3Objects, processAndUploadPlaceImage } from '@/lib/s3';
 
 function getSupabaseAdmin() {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -16,42 +13,6 @@ function getSupabaseAdmin() {
     }
 
     return createAdminClient(supabaseUrl, serviceRoleKey);
-}
-
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-const MAX_SIZE = 5 * 1024 * 1024;
-
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-async function objectExists(bucket: string, key: string) {
-    try {
-        await s3.send(
-            new HeadObjectCommand({
-                Bucket: bucket,
-                Key: key
-            })
-        );
-        return true;
-    } catch {
-        return false;
-    }
-}
-
-// Poll S3 with HeadObject until both small and large exist.
-async function waitForResizedImages(bucket: string, keys: string[], timeoutMs = 15000, intervalMs = 500) {
-    const startedAt = Date.now();
-
-    while (Date.now() - startedAt < timeoutMs) {
-        const results = await Promise.all(keys.map((key) => objectExists(bucket, key)));
-
-        if (results.every(Boolean)) {
-            return true;
-        }
-
-        await sleep(intervalMs);
-    }
-
-    return false;
 }
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -78,10 +39,6 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         const country_mistecka_id = String(formData.get('country_mistecka_id'));
         const area_mistecka_id = String(formData.get('area_mistecka_id'));
 
-        console.log('kind: ', kind);
-        console.log('formData: ', formData);
-        console.log('placeId: ', placeId);
-
         const updatePlaceObject: Record<string, string> = {
             name,
             type,
@@ -90,64 +47,25 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         };
 
         if (image) {
-            if (!(image instanceof File)) {
-                return NextResponse.json({ error: 'Soubor chybí.' }, { status: 400 });
-            }
+            const folderPath =
+                kind === 'loupenicka'
+                    ? `loupenicka/A-${loupenicka_id}`
+                    : `mistecka/M-${mistecka_id}/C-${country_mistecka_id}/A-${area_mistecka_id}`;
 
-            if (!ALLOWED_TYPES.includes(image.type)) {
-                return NextResponse.json({ error: 'Povoleny jsou jen JPG, PNG a WEBP.' }, { status: 400 });
-            }
-
-            if (image.size > MAX_SIZE) {
-                return NextResponse.json({ error: 'Soubor je větší než 5 MB.' }, { status: 400 });
-            }
-
-            const ext = image.name.split('.').pop()?.toLowerCase() ?? 'jpg';
-            const fileId = `${slugify(name)}-${crypto.randomUUID()}`;
-
-            const uploadLoupenickaKey = `loupenicka/A-${loupenicka_id}/${fileId}.${ext}`;
-            const uploadMisteckaKey = `mistecka/M-${mistecka_id}/C-${country_mistecka_id}/A-${area_mistecka_id}/${fileId}.${ext}`;
-
-            const uploadKey = kind === 'loupenicka' ? uploadLoupenickaKey : uploadMisteckaKey;
-
-            const buffer = Buffer.from(await image.arrayBuffer());
-
-            await s3.send(
-                new PutObjectCommand({
-                    Bucket: S3_BUCKET_UPLOAD,
-                    Key: uploadKey,
-                    Body: buffer,
-                    ContentType: image.type
-                })
-            );
-
-            const resizedMisteckaBase = `mistecka/M-${mistecka_id}/C-${country_mistecka_id}/A-${area_mistecka_id}/resized`;
-            const resizedLoupenickaBase = `loupenicka/A-${loupenicka_id}/resized`;
-
-            const resizedBase = kind === 'loupenicka' ? resizedLoupenickaBase : resizedMisteckaBase;
-
-            const smallKey = `${resizedBase}/small/${fileId}.webp`;
-            const largeKey = `${resizedBase}/large/${fileId}.webp`;
-
-            const resizedReady = await waitForResizedImages(S3_BUCKET_RESIZED, [smallKey, largeKey], 20000, 1000);
-
-            if (!resizedReady) {
-                return NextResponse.json({ error: 'Obrázek se neresizoval včas. Zkuste to znovu.' }, { status: 504 });
-            }
-
-            updatePlaceObject.large_image_url = `https://${S3_BUCKET_RESIZED}.s3.${process.env.MISTECKA_AWS_REGION}.amazonaws.com/${largeKey}`;
-            updatePlaceObject.small_image_url = `https://${S3_BUCKET_RESIZED}.s3.${process.env.MISTECKA_AWS_REGION}.amazonaws.com/${smallKey}`;
+            const result = await processAndUploadPlaceImage({ file: image, name, folderPath });
+            updatePlaceObject.large_image_url = result.largeImageUrl;
+            updatePlaceObject.small_image_url = result.smallImageUrl;
         }
 
-        kind === 'loupenicka' && (updatePlaceObject.loupenicka_id = loupenicka_id);
+        if (kind === 'loupenicka') {
+            updatePlaceObject.loupenicka_id = loupenicka_id;
+        }
 
         if (kind === 'mistecka') {
             updatePlaceObject.mistecka_id = mistecka_id;
             updatePlaceObject.country_mistecka_id = country_mistecka_id;
             updatePlaceObject.area_mistecka_id = area_mistecka_id;
         }
-
-        console.log('updatePlaceObject: ', updatePlaceObject);
 
         const admin = getSupabaseAdmin();
 
