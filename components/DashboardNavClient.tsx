@@ -37,14 +37,6 @@ export default function DashboardNavClient({ mistecka }: DashboardNavClientProps
                 />
             </Link>
 
-            <Link
-                href="/dashboard/loupenicka"
-                aria-current={isActive ? 'page' : undefined}
-                className={`nav-pill ${isActive ? 'nav-pill-active' : ''}`}
-            >
-                Loupeníčka
-            </Link>
-
             {mistecka.map((mistecko) => {
                 const href = `/dashboard/${mistecko.id}-${mistecko.slug}`;
                 const isActive = pathname.startsWith(href);
@@ -60,6 +52,13 @@ export default function DashboardNavClient({ mistecka }: DashboardNavClientProps
                     </Link>
                 );
             })}
+            <Link
+                href="/dashboard/loupenicka"
+                aria-current={isActive ? 'page' : undefined}
+                className={`nav-pill ${isActive ? 'nav-pill-active' : ''}`}
+            >
+                Loupeníčka
+            </Link>
         </nav>
     );
 }
