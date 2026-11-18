@@ -192,6 +192,16 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
 
+
+-- pomocna funkce pro distinct types, supabase nema distinct v js api
+CREATE OR REPLACE VIEW public.place_mistecka_types
+WITH (SECURITY_INVOKER = TRUE)
+AS
+SELECT DISTINCT "type"
+FROM public.place_mistecka
+WHERE "type" IS NOT NULL
+ORDER BY "type" ASC;
+
 -- ------------------------------------------------------------
 -- LOUPENICKA
 -- ------------------------------------------------------------

@@ -17,9 +17,6 @@ type DashboardNavClientProps = {
 export default function DashboardNavClient({ mistecka }: DashboardNavClientProps) {
     const pathname = usePathname();
 
-    const href = '/dashboard/loupenicka';
-    const isActive = pathname.startsWith(href);
-
     return (
         <nav aria-label="Hlavní navigace" className="nav-scroll items-center">
             <Link
@@ -54,10 +51,17 @@ export default function DashboardNavClient({ mistecka }: DashboardNavClientProps
             })}
             <Link
                 href="/dashboard/loupenicka"
-                aria-current={isActive ? 'page' : undefined}
-                className={`nav-pill ${isActive ? 'nav-pill-active' : ''}`}
+                aria-current={pathname.includes('loupenicka') ? 'page' : undefined}
+                className={`nav-pill ${pathname.includes('loupenicka') ? 'nav-pill-active' : ''}`}
             >
                 Loupeníčka
+            </Link>
+            <Link
+                href="/dashboard/search"
+                aria-current={pathname.includes('search') ? 'page' : undefined}
+                className={`nav-pill ${pathname.includes('search') ? 'nav-pill-active' : ''}`}
+            >
+                Hledat
             </Link>
         </nav>
     );
