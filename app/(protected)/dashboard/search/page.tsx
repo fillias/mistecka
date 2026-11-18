@@ -5,8 +5,11 @@ import FadeIn from '@/app/UI/FadeIn';
 import { Breadcrumb, BreadcrumbPlaceholder } from '@/components/Breadcrumb';
 import SearchForm from '@/components/SearchForm';
 import PlaceCardWithDetail from '@/components/PlaceCardWirhDetail';
-import { getAllMisteckaTypes, getMisteckaByType } from '@/lib/db/search';
+import { getAllMisteckaTypes, getMisteckaByType, getSearchedMisteckaByCountryAndType } from '@/lib/db/search';
 import userInfo from '@/lib/userInfo';
+import type { Tables } from '@/types/supabase';
+
+type MisteckaPlace = Tables<'place_mistecka'>;
 
 type DashboardSearchPageProps = {
     params: Promise<{ navSlug: string }>;
@@ -17,15 +20,38 @@ async function SearchedPlaces({ searchParams }) {
     const { isAdmin, isEditor } = await userInfo();
     const { typ } = await searchParams;
     const searchedPlaces = await getMisteckaByType(typ);
+    console.log('searchedPlaces: ', searchedPlaces);
+
+    const countryIds = extractUniqueCountryIds(searchedPlaces);
+
+    const placeGroups = await Promise.all(countryIds.map((id) => getSearchedMisteckaByCountryAndType(id, typ)));
+
+    console.log('placeGroups: ', placeGroups);
 
     return (
-        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {searchedPlaces.map((place) => (
-                <li key={place.id}>
-                    <PlaceCardWithDetail kind="mistecka" place={place} canManage={isAdmin || isEditor} />
-                </li>
-            ))}
-        </ul>
+        <div>
+            {placeGroups.map((countryPlaces) => {
+                const [country, places] = countryPlaces;
+
+                return (
+                    <div key={country}>
+                        <h3>{country}</h3>
+
+                        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            {places.map((place: MisteckaPlace) => (
+                                <li key={place.id}>
+                                    <PlaceCardWithDetail
+                                        kind="mistecka"
+                                        place={place}
+                                        canManage={isAdmin || isEditor}
+                                    />
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                );
+            })}
+        </div>
     );
 }
 
@@ -57,4 +83,8 @@ export default async function DashboardSearchPage({ searchParams }: DashboardSea
             </Suspense>
         </div>
     );
+}
+
+function extractUniqueCountryIds(items) {
+    return [...new Set(items.map((item) => item.country_mistecka_id))];
 }

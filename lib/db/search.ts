@@ -33,3 +33,28 @@ export async function getMisteckaByType(type: string) {
     if (error) throw error;
     return data ?? [];
 }
+
+async function getCountryById(id: number) {
+    const supabase = createAdminClient();
+
+    const { data, error } = await supabase.from('country_mistecka').select('name').eq('id', id);
+
+    if (error) throw error;
+    return data[0].name || null;
+}
+
+export async function getSearchedMisteckaByCountryAndType(countryId: number, type: string) {
+    const supabase = createAdminClient();
+
+    const countryName: string = await getCountryById(countryId);
+
+    const { data, error } = await supabase
+        .from('place_mistecka')
+        .select('*')
+        .eq('country_mistecka_id', countryId)
+        .eq('type', type);
+
+    if (error) throw error;
+
+    return [countryName, data];
+}

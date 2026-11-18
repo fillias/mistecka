@@ -93,7 +93,7 @@ export default function SearchForm({ misteckaTypes }: MisteckaProps) {
                     )}
                 </div>
 
-                <div className="flex justify-end gap-2 pt-2">
+                {/* <div className="flex justify-end gap-2 pt-2">
                     <button
                         type="button"
                         onClick={() => setOpen(false)}
@@ -109,7 +109,7 @@ export default function SearchForm({ misteckaTypes }: MisteckaProps) {
                     >
                         {loading ? 'Ukládám…' : 'Vytvořit'}
                     </button>
-                </div>
+                </div> */}
             </form>
         </>
     );
