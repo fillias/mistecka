@@ -136,13 +136,14 @@ export async function getCountryNamesByType(type: string) {
       )
     `
         )
-        .eq('type', type);
+        .eq('type', type)
+        .overrideTypes<{ country_mistecka: { name: string } }[], { merge: false }>();
 
     if (error) throw error;
 
     const countryNames = [
         ...new Set(
-            data?.map((item) => item.country_mistecka?.name).filter((name): name is string => Boolean(name)) ?? []
+            (data ?? []).map((item) => item.country_mistecka.name).filter((name): name is string => Boolean(name))
         )
     ];
 
