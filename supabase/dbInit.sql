@@ -202,6 +202,15 @@ FROM public.place_mistecka
 WHERE "type" IS NOT NULL
 ORDER BY "type" ASC;
 
+-- pomocna funkce pro distinct country names, supabase nema distinct v js api
+CREATE OR REPLACE VIEW public.country_mistecka_names
+WITH (SECURITY_INVOKER = TRUE)
+AS
+SELECT DISTINCT "name"
+FROM public.country_mistecka
+WHERE "name" IS NOT NULL
+ORDER BY "name" ASC;
+
 -- ------------------------------------------------------------
 -- LOUPENICKA
 -- ------------------------------------------------------------

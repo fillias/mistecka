@@ -1,6 +1,5 @@
 'use client';
 
-import type { SubmitEventHandler } from 'react';
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
@@ -8,10 +7,13 @@ type MisteckaProps = {
     misteckaTypes: string[];
 };
 
-export default function SearchForm({ misteckaTypes }: MisteckaProps) {
-    const [loading, setLoading] = useState(false);
+type MisteckaCountryProps = {
+    misteckaCountryNames: string[];
+};
+
+export function SearchTypesForm({ misteckaTypes }: MisteckaProps) {
     const [error, setError] = useState<string | null>(null);
-    const [open, setOpen] = useState(false);
+
     const [type, setType] = useState('');
 
     const router = useRouter();
@@ -23,41 +25,9 @@ export default function SearchForm({ misteckaTypes }: MisteckaProps) {
         router.push(`/dashboard/search?typ=${encodeURIComponent(typ)}`);
     };
 
-    const onSubmit: SubmitEventHandler<HTMLFormElement> = async (e) => {
-        e.preventDefault();
-
-        /*
-
-    try {
-        const res = await fetch('/api/search', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                name: name.trim(),
-                slug: slugify(name)
-            })
-        });
-
-        const result = await res.json();
-
-        if (!res.ok) {
-            throw new Error(result.error || 'Nepodařilo se vytvořit Loupeníčko');
-        }
-
-        router.refresh();
-    } catch (err) {
-        setError(err instanceof Error ? err.message : 'Nastala chyba pri hledani');
-    } finally {
-        setLoading(false);
-    }
-        */
-    };
-
     return (
         <>
-            <form onSubmit={onSubmit} className="space-y-4">
+            <form className="space-y-4">
                 <div>
                     {misteckaTypes && (
                         <>
@@ -92,24 +62,55 @@ export default function SearchForm({ misteckaTypes }: MisteckaProps) {
                         </div>
                     )}
                 </div>
+            </form>
+        </>
+    );
+}
 
-                {/* <div className="flex justify-end gap-2 pt-2">
-                    <button
-                        type="button"
-                        onClick={() => setOpen(false)}
-                        className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
-                    >
-                        Zrušit
-                    </button>
+export function SearchCountriesForm({ misteckaCountryNames }: MisteckaCountryProps) {
+    const [error, setError] = useState<string | null>(null);
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const country = searchParams.get('country') ?? '';
 
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
-                    >
-                        {loading ? 'Ukládám…' : 'Vytvořit'}
-                    </button>
-                </div> */}
+    const typ = searchParams.get('typ');
+
+    const onSetCountry = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        const countryName = event.target.value;
+        router.push(`/dashboard/search?typ=${encodeURIComponent(typ)}&country=${encodeURIComponent(countryName)}`);
+    };
+
+    return (
+        <>
+            <form className="space-y-4">
+                <div>
+                    {misteckaCountryNames && (
+                        <>
+                            <select
+                                id="place-type"
+                                value={country}
+                                onChange={(e) => onSetCountry(e)}
+                                required
+                                className="mb-3 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-300 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:focus:border-slate-500 dark:focus:ring-slate-700"
+                            >
+                                <option value="" disabled>
+                                    Vyber zemi
+                                </option>
+                                {misteckaCountryNames.map((name) => (
+                                    <option key={name} value={name}>
+                                        {name}
+                                    </option>
+                                ))}
+                            </select>
+                        </>
+                    )}
+
+                    {error && (
+                        <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-300">
+                            {error}
+                        </div>
+                    )}
+                </div>
             </form>
         </>
     );

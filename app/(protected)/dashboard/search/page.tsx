@@ -2,10 +2,9 @@
 
 import { Suspense } from 'react';
 import FadeIn from '@/app/UI/FadeIn';
-import { Breadcrumb, BreadcrumbPlaceholder } from '@/components/Breadcrumb';
-import SearchForm from '@/components/SearchForm';
+import { SearchTypesForm, SearchCountriesForm } from '@/components/SearchForm';
 import PlaceCardWithDetail from '@/components/PlaceCardWirhDetail';
-import { getAllMisteckaTypes, getMisteckaByType, getSearchedMisteckaByCountryAndType } from '@/lib/db/search';
+import { getAllMisteckaTypes, getSearchedMisteckaByTypeAndCountryName, getCountryNamesByType } from '@/lib/db/search';
 import userInfo from '@/lib/userInfo';
 import type { Tables } from '@/types/supabase';
 
@@ -16,29 +15,33 @@ type DashboardSearchPageProps = {
     searchParams: Promise<{ typ?: string }>;
 };
 
+async function SearchCountryByType({ searchParams }) {
+    let { typ } = await searchParams;
+
+    const countryNames = await getCountryNamesByType(typ);
+
+    return <Suspense>{typ && countryNames && <SearchCountriesForm misteckaCountryNames={countryNames} />}</Suspense>;
+}
+
 async function SearchedPlaces({ searchParams }) {
     const { isAdmin, isEditor } = await userInfo();
-    const { typ } = await searchParams;
-    const searchedPlaces = await getMisteckaByType(typ);
-    console.log('searchedPlaces: ', searchedPlaces);
 
-    const countryIds = extractUniqueCountryIds(searchedPlaces);
+    const { typ, country } = await searchParams;
 
-    const placeGroups = await Promise.all(countryIds.map((id) => getSearchedMisteckaByCountryAndType(id, typ)));
+    const placeGroups = await getSearchedMisteckaByTypeAndCountryName(typ, country);
 
-    console.log('placeGroups: ', placeGroups);
+    // console.log('placeGroups: ', placeGroups);
+
+    const [countryName, places] = placeGroups;
 
     return (
         <div>
-            {placeGroups.map((countryPlaces) => {
-                const [country, places] = countryPlaces;
-
-                return (
-                    <div key={country}>
-                        <h3>{country}</h3>
-
-                        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            {places.map((place: MisteckaPlace) => (
+            {countryName && (
+                <>
+                    <h2 className="mb-5 border-b border-slate-300 pb-1">{countryName}</h2>
+                    <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        {Array.isArray(places) &&
+                            places.map((place: MisteckaPlace) => (
                                 <li key={place.id}>
                                     <PlaceCardWithDetail
                                         kind="mistecka"
@@ -47,10 +50,9 @@ async function SearchedPlaces({ searchParams }) {
                                     />
                                 </li>
                             ))}
-                        </ul>
-                    </div>
-                );
-            })}
+                    </ul>
+                </>
+            )}
         </div>
     );
 }
@@ -60,20 +62,22 @@ export default async function DashboardSearchPage({ searchParams }: DashboardSea
 
     return (
         <div className="page-stack">
-            {/* <Suspense fallback={<BreadcrumbPlaceholder />}>
-                <Breadcrumb mainSection={`search`} params={params} />
-            </Suspense> */}
             <div className="card">
                 <div className="flex items-start justify-between gap-4">
                     <div>
-                        <h2 className="mb-1">Hledat</h2>
-                        <p>Vyber místo</p>
+                        <h2 className="">Hledat</h2>
                     </div>
                 </div>
             </div>
 
             <Suspense>
-                <SearchForm misteckaTypes={misteckaTypes} />
+                <SearchTypesForm misteckaTypes={misteckaTypes} />
+            </Suspense>
+
+            <Suspense>
+                <FadeIn>
+                    <SearchCountryByType searchParams={searchParams} />
+                </FadeIn>
             </Suspense>
 
             <Suspense>
@@ -83,8 +87,4 @@ export default async function DashboardSearchPage({ searchParams }: DashboardSea
             </Suspense>
         </div>
     );
-}
-
-function extractUniqueCountryIds(items) {
-    return [...new Set(items.map((item) => item.country_mistecka_id))];
 }

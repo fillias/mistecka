@@ -25,6 +25,28 @@ export async function getAllMisteckaTypes() {
     return misteckaTypes ?? [];
 }
 
+export async function getAllMisteckaCountryNames() {
+    'use cache';
+    cacheTag('mistecka-all-countries');
+    cacheLife('hours');
+
+    const supabase = createAdminClient();
+
+    type MisteckaCountry = string;
+
+    const { data, error } = await supabase
+        .from('country_mistecka_names')
+        .select('name')
+        .order('name', { ascending: true });
+
+    if (error) throw error;
+
+    const misteckaCountryNames: MisteckaCountry[] = data.map((row) => row.name);
+
+    if (error) throw error;
+    return misteckaCountryNames ?? [];
+}
+
 export async function getMisteckaByType(type: string) {
     const supabase = createAdminClient();
 
@@ -57,4 +79,72 @@ export async function getSearchedMisteckaByCountryAndType(countryId: number, typ
     if (error) throw error;
 
     return [countryName, data];
+}
+
+export async function getSearchedMisteckaByCountryName(countryName: string) {
+    const supabase = createAdminClient();
+
+    const { data, error } = await supabase
+        .from('place_mistecka')
+        .select(
+            `
+                *,
+                country_mistecka!inner (
+                    id,
+                    name
+                )
+                `
+        )
+        .eq('country_mistecka.name', countryName);
+
+    if (error) throw error;
+
+    return data;
+}
+
+export async function getSearchedMisteckaByTypeAndCountryName(type: string, countryName: string) {
+    const supabase = createAdminClient();
+
+    const { data, error } = await supabase
+        .from('place_mistecka')
+        .select(
+            `
+                *,
+                country_mistecka!inner (
+                    id,
+                    name
+                )
+                `
+        )
+        .eq('type', type)
+        .eq('country_mistecka.name', countryName);
+
+    if (error) throw error;
+
+    return [countryName, data];
+}
+
+export async function getCountryNamesByType(type: string) {
+    const supabase = createAdminClient();
+
+    const { data, error } = await supabase
+        .from('place_mistecka')
+        .select(
+            `
+      country_mistecka!inner (
+        name
+      )
+    `
+        )
+        .eq('type', type);
+
+    if (error) throw error;
+
+    const countryNames = [
+        ...new Set(
+            data?.map((item) => item.country_mistecka?.name).filter((name): name is string => Boolean(name)) ?? []
+        )
+    ];
+
+    return countryNames;
 }
