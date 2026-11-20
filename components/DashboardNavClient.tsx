@@ -12,10 +12,34 @@ type MisteckoItem = {
 
 type DashboardNavClientProps = {
     mistecka: MisteckoItem[];
+    device: string | null;
 };
 
-export default function DashboardNavClient({ mistecka }: DashboardNavClientProps) {
+export default function DashboardNavClient({ mistecka, device }: DashboardNavClientProps) {
     const pathname = usePathname();
+
+    const isMobileDashboardHP = device === 'm' && pathname === '/dashboard';
+
+    if (isMobileDashboardHP) {
+        return (
+            <nav aria-label="Hlavní navigace" className="nav-scroll items-center justify-center">
+                <Link
+                    href="/dashboard"
+                    className="mr-3 flex h-14 w-14 shrink-0 items-center justify-center sm:mr-4 sm:h-16 sm:w-16"
+                    aria-label="Přejít na dashboard"
+                >
+                    <Image
+                        src="/surfer-van.svg"
+                        width={48}
+                        height={48}
+                        priority
+                        alt="Místečka logo"
+                        className="logo-img h-15 w-15 sm:h-12 sm:w-12"
+                    />
+                </Link>
+            </nav>
+        );
+    }
 
     return (
         <nav aria-label="Hlavní navigace" className="nav-scroll items-center">

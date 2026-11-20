@@ -1,5 +1,5 @@
 import { createServerClient } from '@supabase/ssr';
-import { NextResponse, type NextRequest } from 'next/server';
+import { NextResponse, userAgent, type NextRequest } from 'next/server';
 
 export async function proxy(request: NextRequest) {
     const requestHeaders = new Headers(request.headers);
@@ -59,10 +59,39 @@ export async function proxy(request: NextRequest) {
         return copyCookiesToRedirect(response, NextResponse.redirect(new URL('/dashboard', request.url)));
     }
 
+    // Show a completely different dashboard for mobile/tablet visitors.
+    if (pathname === '/dashboard') {
+        const { device } = userAgent(request);
+
+        if (device.type === 'mobile' || device.type === 'tablet') {
+            requestHeaders.set('x-device', 'm');
+
+            const mobileUrl = request.nextUrl.clone();
+            mobileUrl.pathname = '/dashboard-mobile';
+
+            return copyCookiesToRewrite(
+                response,
+                NextResponse.rewrite(new URL(mobileUrl.pathname + mobileUrl.search, request.url), {
+                    request: {
+                        headers: requestHeaders
+                    }
+                })
+            );
+        }
+    }
+
     return response;
 }
 
 function copyCookiesToRedirect(source: NextResponse, target: NextResponse) {
+    for (const cookie of source.cookies.getAll()) {
+        target.cookies.set(cookie);
+    }
+
+    return target;
+}
+
+function copyCookiesToRewrite(source: NextResponse, target: NextResponse) {
     for (const cookie of source.cookies.getAll()) {
         target.cookies.set(cookie);
     }

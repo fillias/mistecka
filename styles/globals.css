@@ -12,7 +12,7 @@
     --surface-hover: 44 63 105;
 
     --text: 226 232 240;
-    --text-soft: 160 174 196;
+    --text-soft: rgb(220, 217, 217);
     --text-faint: 90 107 135;
 
     --border: 58 78 118;
@@ -253,6 +253,16 @@ select {
     .nav-pill {
         @apply inline-flex items-center whitespace-nowrap rounded-2xl px-4 py-2 text-sm font-medium border;
         min-height: 44px;
+        background: rgb(var(--surface));
+        color: rgb(var(--text-soft));
+        border-color: rgb(var(--border));
+    }
+
+    .nav-pill-mobile-hp {
+        @apply text-3xl;
+        display: grid;
+        text-align: center;
+        min-height: 74px;
         background: rgb(var(--surface));
         color: rgb(var(--text-soft));
         border-color: rgb(var(--border));
